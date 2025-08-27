@@ -1,0 +1,84 @@
+{
+  "language_info": {
+    "target_language": "Neerlandés",
+    "learning_language": "Español",
+    "version": "1.0"
+  },
+  "lessons": [
+    {
+      "id": "L01",
+      "title": "En el restaurante",
+      "icon": "restaurant",
+      "content": [
+        { "type": "vocabulary", "data": { "Water": "Agua" } },
+        { "type": "vocabulary", "data": { "Brood": "Pan" } },
+        { "type": "tip", "text": "En los Países Bajos, al pedir agua en un restaurante, suele servirse agua embotellada y no del grifo." },
+        { "type": "expression", "data": { "phrase": "Mag ik water, alstublieft?", "meaning": "¿Puedo tener agua, por favor?" } },
+        { "type": "grammar", "title": "Uso de 'mag ik...'", "explanation": "La expresión 'mag ik...' significa '¿puedo tener...?'. Es una manera educada de pedir algo." },
+        { "type": "practice_builder", "task": "Construye la frase:", "structure": ["Mag ik", "brood", "alstublieft?"], "translation": "(¿Puedo tener pan, por favor?)" },
+        { "type": "llm_check", "prompt": "¿Cómo pedirías educadamente un café al camarero?" },
+        { "type": "extra", "title": "¡A practicar!", "content": "Intenta pedir distintos alimentos usando 'Mag ik ... alstublieft?'" }
+      ]
+    },
+    {
+      "id": "L02",
+      "title": "En el parque",
+      "icon": "park",
+      "content": [
+        { "type": "vocabulary", "data": { "Hond": "Perro" } },
+        { "type": "vocabulary", "data": { "Boom": "Árbol" } },
+        { "type": "expression", "data": { "phrase": "Wat mooi!", "meaning": "¡Qué bonito!" } },
+        { "type": "tip", "text": "En neerlandés, 'oo' se pronuncia como una 'o' larga, similar a 'oo' en 'boot' (bote)." }
+      ]
+    },
+    {
+      "id": "L03",
+      "title": "En el supermercado",
+      "icon": "shopping_cart",
+      "content": [
+        { "type": "vocabulary", "data": { "Melk": "Leche" } },
+        { "type": "vocabulary", "data": { "Kaas": "Queso" } },
+        { "type": "expression", "data": { "phrase": "Waar is de melk?", "meaning": "¿Dónde está la leche?" } },
+        { "type": "grammar", "title": "Uso de 'waar is...'", "explanation": "'Waar is...' significa '¿dónde está...?'. Se utiliza para preguntar por la ubicación de algo." },
+        { "type": "practice_builder", "task": "Construye la pregunta:", "structure": ["Waar is", "de kaas", "?"], "translation": "(¿Dónde está el queso?)" }
+      ]
+    },
+    {
+      "id": "L04",
+      "title": "Saludos y presentaciones",
+      "icon": "handshake",
+      "content": [
+        { "type": "vocabulary", "data": { "Hallo": "Hola" } },
+        { "type": "vocabulary", "data": { "Tot ziens": "Adiós / Hasta luego" } },
+        { "type": "expression", "data": { "phrase": "Ik heet María", "meaning": "Me llamo María" } },
+        { "type": "expression", "data": { "phrase": "Hoe heet jij?", "meaning": "¿Cómo te llamas?" } },
+        { "type": "tip", "text": "En neerlandés, 'jij' se usa para 'tú' en situaciones informales." }
+      ]
+    },
+    {
+      "id": "L05",
+      "title": "Transporte y direcciones",
+      "icon": "bus",
+      "content": [
+        { "type": "vocabulary", "data": { "Trein": "Tren" } },
+        { "type": "vocabulary", "data": { "Bus": "Autobús" } },
+        { "type": "vocabulary", "data": { "Station": "Estación" } },
+        { "type": "expression", "data": { "phrase": "Waar is het station?", "meaning": "¿Dónde está la estación?" } },
+        { "type": "expression", "data": { "phrase": "Ik wil naar Amsterdam", "meaning": "Quiero ir a Ámsterdam" } },
+        { "type": "grammar", "title": "Uso de 'ik wil...'", "explanation": "'Ik wil...' significa 'yo quiero...'. Se usa para expresar deseos o intenciones." }
+      ]
+    },
+    {
+      "id": "L06",
+      "title": "En casa",
+      "icon": "home",
+      "content": [
+        { "type": "vocabulary", "data": { "Kamer": "Habitación" } },
+        { "type": "vocabulary", "data": { "Keuken": "Cocina" } },
+        { "type": "vocabulary", "data": { "Bed": "Cama" } },
+        { "type": "expression", "data": { "phrase": "Dit is mijn kamer", "meaning": "Esta es mi habitación" } },
+        { "type": "tip", "text": "La palabra 'mijn' significa 'mi'." }
+      ]
+    }
+  ]
+}
