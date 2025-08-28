@@ -1,3 +1,4 @@
+# data_manager.py
 import json
 
 class DataManager:
@@ -25,3 +26,20 @@ class DataManager:
         """Devuelve el contenido (diapositivas) de una lección específica."""
         lesson = self.get_lesson_by_id(lesson_id)
         return lesson.get('content', []) if lesson else []
+    
+    # +++ NEW METHOD +++
+    def get_content_by_item_id(self, item_id: str) -> dict | None:
+        """
+        Encuentra el texto de un concepto específico a partir de su item_id.
+        """
+        for lesson in self.get_lessons():
+            for content_item in lesson.get('content', []):
+                if content_item.get('item_id') == item_id:
+                    if content_item['type'] == 'vocabulary':
+                        return list(content_item['data'].keys())[0]
+                    elif content_item['type'] == 'expression':
+                        return content_item['data']['phrase']
+                    elif content_item['type'] == 'grammar':
+                        # Para gramática, usamos el título como una palabra clave
+                        return content_item['title']
+        return None
