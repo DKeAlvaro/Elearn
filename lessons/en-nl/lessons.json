@@ -1,0 +1,44 @@
+{
+  "language_info": {
+    "target_language": "Dutch",
+    "learning_language": "English",
+    "version": "1.1"
+  },
+  "lessons": [
+    {
+      "id": "L01",
+      "title": "At the restaurant",
+      "icon": "restaurant",
+      "key_concepts": ["Water", "Brood", "Mag ik", "alstublieft"],
+      "content": [
+        { "type": "vocabulary", "item_id": "L01_V01", "data": { "Water": "Water" } },
+        { "type": "vocabulary", "item_id": "L01_V02", "data": { "Brood": "Bread" } },
+        { "type": "tip", "text": "In the Netherlands, when ordering water at a restaurant, bottled water is usually served rather than tap water." },
+        { "type": "expression", "item_id": "L01_E01", "data": { "phrase": "Mag ik water, alstublieft?", "meaning": "May I have water, please?" } },
+        { "type": "grammar", "item_id": "L01_G01", "title": "Using 'mag ik...'", "explanation": "The expression 'mag ik...' means 'may I have...?'. It's a polite way to ask for something." },
+        {
+          "type": "interactive_scenario",
+          "scenario_id": "L01_S01",
+          "title": "Order at the restaurant!",
+          "setting": "You are at a restaurant in Amsterdam. The LLM will act as the waiter.",
+          "user_goal": "Politely order bread and water using the phrases you have learned.",
+          "llm_persona": "Act as a friendly Dutch waiter. Respond in Dutch in a simple and natural way. Your goal is to help the user practice. If the user has difficulties, subtly guide them to use the expression 'Mag ik...'. Keep your responses short.",
+          "initial_prompt": "Goedenavond! Wat kan ik voor u doen?",
+          "required_concepts": ["L01_V01", "L01_V02", "L01_G01"],
+          "success_condition": "The user has correctly ordered water and bread using the structure 'Mag ik...'."
+        }
+      ]
+    },
+    {
+      "id": "L02",
+      "title": "In the park",
+      "icon": "park",
+      "content": [
+        { "type": "vocabulary", "data": { "Hond": "Dog" } },
+        { "type": "vocabulary", "data": { "Boom": "Tree" } },
+        { "type": "expression", "data": { "phrase": "Wat mooi!", "meaning": "How beautiful!" } },
+        { "type": "tip", "text": "In Dutch, 'oo' is pronounced as a long 'o', similar to 'oo' in 'boot'." }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,7 @@ from ui_factory import create_slide_content
 from ui_components import ChatMessage, LoadingMessage 
 from utils.typing_simulator import simulate_typing
 from llm_client import LLMClient
+import config
 import json
 import re
 import asyncio
@@ -27,7 +28,7 @@ class LessonView(ft.View):
             expand=True
         )
 
-        self.previous_button = ft.ElevatedButton("Anterior", on_click=self.go_previous, visible=False)
+        self.previous_button = ft.ElevatedButton(config.get_text("previous"), on_click=self.go_previous, visible=False)
         self.next_button = ft.ElevatedButton(on_click=self.go_next)
 
         self.controls = [
@@ -50,7 +51,7 @@ class LessonView(ft.View):
 
         lesson_content = self.app_state.data_manager.get_lesson_content(self.app_state.current_lesson_id)
         is_last_slide = self.app_state.current_slide_index == len(lesson_content) - 1
-        self.next_button.text = "Finalizar" if is_last_slide else "Siguiente"
+        self.next_button.text = config.get_text("finish", "Finalizar") if is_last_slide else config.get_text("next", "Siguiente")
         self.previous_button.visible = self.app_state.current_slide_index > 0
         
         # Disable 'Finalizar' button by default on last slide
@@ -90,11 +91,11 @@ class LessonView(ft.View):
         def update_progress_ui():
             total = len(self.required_concepts)
             covered = len(self.covered_concepts)
-            progress_text.value = f"Progreso: {covered} / {total} conceptos cubiertos"
+            progress_text.value = config.get_text("progress_text", "Progreso: {covered} / {total} conceptos cubiertos").format(covered=covered, total=total)
             
             is_completed = covered == total and total > 0
             if is_completed:
-                progress_text.value = "¡Objetivo completado!"
+                progress_text.value = config.get_text("objective_completed", "¡Objetivo completado!")
                 # Enable the Finalizar button when interactive scenario is completed
                 lesson_content = self.app_state.data_manager.get_lesson_content(self.app_state.current_lesson_id)
                 is_last_slide = self.app_state.current_slide_index == len(lesson_content) - 1

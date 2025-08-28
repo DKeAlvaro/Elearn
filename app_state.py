@@ -1,6 +1,5 @@
 # app_state.py
 from data_manager import DataManager
-from config import THEMES
 import json
 import os
 
@@ -50,9 +49,6 @@ class AppState:
             return lesson.get("title", "Lección") if lesson else "Lección"
         return "Lección"
 
-    def cycle_theme(self):
-        """Cambia al siguiente tema de la lista."""
-        self.current_theme_index = (self.current_theme_index + 1) % len(THEMES)
     
     def mark_lesson_completed(self, lesson_id: str):
         """Marca una lección como completada."""

@@ -1,4 +1,7 @@
+# ui_factory.py
 import flet as ft
+import config
+from ui_components import ChatMessage
 
 def create_slide_content(slide_data: dict):
     """
@@ -11,20 +14,12 @@ def create_slide_content(slide_data: dict):
         # +++ ADDED progress_text control +++
         progress_text = ft.Text(size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700)
         chat_messages = ft.ListView(expand=True, spacing=10, auto_scroll=True)
-        new_message = ft.TextField(
-            hint_text="Escribe tu respuesta...", 
-            expand=True,
-            border_radius=20,
-            border_color=ft.Colors.with_opacity(0.5, ft.Colors.BLACK),
-            height=50,
-            content_padding=15
-        )
-        send_button = ft.IconButton(icon=ft.Icons.SEND_ROUNDED, icon_color=ft.Colors.WHITE, bgcolor=ft.Colors.BLUE_GREY_500)
-
+        new_message = ft.TextField(label=config.get_text("type_message", "Escribe tu mensaje..."), expand=True)
+        send_button = ft.ElevatedButton(config.get_text("send_message", "Enviar"))
         container = ft.Column(
             controls=[
                 ft.Text(slide_data.get('title', 'Conversación'), size=24, weight=ft.FontWeight.BOLD),
-                ft.Text(f"Tu objetivo: {slide_data.get('user_goal')}", size=16),
+                ft.Text(f"{config.get_text("objective_text")} {slide_data.get('user_goal')}", size=16),
                 progress_text,
                 ft.Divider(),
                 chat_messages,
@@ -47,8 +42,8 @@ def create_slide_content(slide_data: dict):
 
     if slide_type == 'llm_check':
         prompt_text = ft.Text(slide_data['prompt'], size=20, text_align=ft.TextAlign.CENTER)
-        answer_field = ft.TextField(label="Tu respuesta...", width=300, text_align=ft.TextAlign.CENTER)
-        check_button = ft.ElevatedButton("Comprobar con IA")
+        answer_field = ft.TextField(label=config.get_text("your_answer", "Tu respuesta..."), width=300, text_align=ft.TextAlign.CENTER)
+        check_button = ft.ElevatedButton(config.get_text("check_with_ai", "Comprobar con IA"))
         result_text = ft.Text(value="", size=16, text_align=ft.TextAlign.CENTER, italic=True)
         
         container = ft.Column(

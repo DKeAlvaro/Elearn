@@ -1,5 +1,7 @@
+# views/home_view.py
 import flet as ft
 from app_state import AppState
+import config
 
 def HomeView(page: ft.Page, app_state: AppState):
 
@@ -26,8 +28,8 @@ def HomeView(page: ft.Page, app_state: AppState):
             size=24
         )
         
-        # Button text changes based on completion
-        button_text = "Repasar" if is_completed else "Comenzar"
+        # Update button text based on completion status
+        button_text = config.get_text("review_lesson", "Repasar") if app_state.is_lesson_completed(lesson_id) else config.get_text("start_lesson", "Comenzar")
         button_color = ft.Colors.BLUE_GREY if is_completed else None
         
         # Modern card-based design for lessons
@@ -70,7 +72,7 @@ def HomeView(page: ft.Page, app_state: AppState):
         controls=[
             ft.AppBar(
                 title=ft.Text(
-                    "Elige una lección",
+                    config.get_text("choose_lesson", "Elige una lección"),
                     size=20,
                     weight=ft.FontWeight.W_600
                 ),

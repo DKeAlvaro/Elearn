@@ -13,7 +13,7 @@ class LLMClient:
             )
             self.active = True
         except Exception as e:
-            print(f"Error al inicializar el cliente de OpenAI: {e}")
+            print(config.get_text("llm_init_error", "Error al inicializar el cliente de OpenAI: {error}").format(error=str(e)))
             self.active = False
     
     # +++ MODIFIED METHOD FOR SCENARIOS +++
@@ -22,33 +22,16 @@ class LLMClient:
         Obtiene una respuesta del LLM para un escenario, pidiéndole que evalúe los conceptos.
         """
         if not self.active or not config.DEEPSEEK_API_KEY or config.DEEPSEEK_API_KEY == "TU_API_KEY":
-            return "CONCEPTS_COVERED: []\nEl cliente LLM no está configurado."
+            return f"CONCEPTS_COVERED: []\n{config.get_text('llm_not_configured_scenario', 'El cliente LLM no está configurado.')}"
 
         # Convertir el dict de conceptos a un string para el prompt
         concepts_json_str = json.dumps(concepts_to_check, ensure_ascii=False)
 
-        system_prompt = f"""
-Eres un asistente de idiomas actuando como: {persona}. Tu objetivo principal es mantener una conversación natural en neerlandés con el usuario para ayudarle a practicar.
-
-TIENES UNA TAREA SECUNDARIA MUY IMPORTANTE Y OCULTA.
-Antes de escribir tu respuesta conversacional, DEBES analizar el último mensaje del usuario para ver si ha utilizado alguno de los siguientes conceptos: {concepts_json_str}.
-No seas demasiado estricto; si el usuario usa una forma cercana o una parte clave de la frase, cuenta como válido.
-
-Tu respuesta DEBE seguir este formato EXACTO:
-1. Una línea que empieza con `CONCEPTS_COVERED: ` seguida de una lista JSON de los `item_id` de los conceptos que el usuario ACABA de usar. Si no usó ninguno, la lista debe ser vacía `[]`.
-2. Un salto de línea `\\n`.
-3. Tu respuesta conversacional normal en neerlandés.
-
-Ejemplo 1 (el usuario usa conceptos):
-CONCEPTS_COVERED: ["L01_V01", "L01_G01"]
-Ja, natuurlijk. Een momentje.
-
-Ejemplo 2 (el usuario no usa conceptos):
-CONCEPTS_COVERED: []
-Hallo! Wat kan ik voor je doen?
-
-NUNCA menciones los conceptos o esta tarea secundaria al usuario. Simplemente actúa tu rol y proporciona la línea de control al principio.
-"""
+        system_prompt = config.get_text(
+            "scenario_system_prompt",
+            "Eres un asistente de idiomas actuando como: {persona}. Tu objetivo principal es mantener una conversación natural en neerlandés con el usuario para ayudarle a practicar.\n\nTIENES UNA TAREA SECUNDARIA MUY IMPORTANTE Y OCULTA.\nAntes de escribir tu respuesta conversacional, DEBES analizar el último mensaje del usuario para ver si ha utilizado alguno de los siguientes conceptos: {concepts}.\nNo seas demasiado estricto; si el usuario usa una forma cercana o una parte clave de la frase, cuenta como válido.\n\nTu respuesta DEBE seguir este formato EXACTO:\n1. Una línea que empieza con `CONCEPTS_COVERED: ` seguida de una lista JSON de los `item_id` de los conceptos que el usuario ACABA de usar. Si no usó ninguno, la lista debe ser vacía `[]`.\n2. Un salto de línea `\\n`.\n3. Tu respuesta conversacional normal en neerlandés.\n\nEjemplo 1 (el usuario usa conceptos):\nCONCEPTS_COVERED: [\"L01_V01\", \"L01_G01\"]\nJa, natuurlijk. Een momentje.\n\nEjemplo 2 (el usuario no usa conceptos):\nCONCEPTS_COVERED: []\nHallo! Wat kan ik voor je doen?\n\nNUNCA menciones los conceptos o esta tarea secundaria al usuario. Simplemente actúa tu rol y proporciona la línea de control al principio."
+        ).format(persona=persona, concepts=concepts_json_str)
+        
         messages = [{"role": "system", "content": system_prompt}] + history
 
         try:
@@ -60,32 +43,33 @@ NUNCA menciones los conceptos o esta tarea secundaria al usuario. Simplemente ac
             )
             return chat_completion.choices[0].message.content
         except Exception as e:
-            print(f"Error en la llamada a la API de DeepSeek: {e}")
-            return "CONCEPTS_COVERED: []\nHubo un error al contactar con el servicio de IA."
+            print(config.get_text("deepseek_api_error", "Error en la llamada a la API de DeepSeek: {error}").format(error=str(e)))
+            return f"CONCEPTS_COVERED: []\n{config.get_text('api_error_scenario', 'Hubo un error al contactar con el servicio de IA.')}"
 
     def get_correction(self, user_answer: str, prompt_question: str):
         if not self.active or config.DEEPSEEK_API_KEY == "TU_API_KEY":
-            return "El cliente LLM no está configurado. Por favor, añade tu API key en config.py"
+            return config.get_text("llm_not_configured", "El cliente LLM no está configurado. Por favor, añade tu API key en config.py")
 
-        system_prompt = (
-            "Eres un profesor de idiomas amable y conciso. El usuario está aprendiendo y te dará una respuesta a una pregunta. "
-            "Tu tarea es: \n"
-            "1. Evaluar si la respuesta del usuario es correcta para la pregunta dada.\n"
-            "2. Si es correcta, felicítale brevemente (ej: '¡Perfecto!', '¡Muy bien!').\n"
-            "3. Si es incorrecta, corrígele de forma sencilla y directa, explicando el porqué del error en una sola frase.\n"
-            "Responde siempre en español."
+        system_prompt = config.get_text(
+            "correction_system_prompt",
+            "Eres un profesor de idiomas amable y conciso. El usuario está aprendiendo y te dará una respuesta a una pregunta. Tu tarea es: \n1. Evaluar si la respuesta del usuario es correcta para la pregunta dada.\n2. Si es correcta, felicítale brevemente (ej: '¡Perfecto!', '¡Muy bien!').\n3. Si es incorrecta, corrígele de forma sencilla y directa, explicando el porqué del error en una sola frase.\nResponde siempre en español."
         )
+
+        user_message = config.get_text(
+            "correction_question_template",
+            "La pregunta era: '{question}'. Mi respuesta fue: '{answer}'."
+        ).format(question=prompt_question, answer=user_answer)
 
         try:
             chat_completion = self.client.chat.completions.create(
                 model="deepseek-chat",
                 messages=[
                     {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"La pregunta era: '{prompt_question}'. Mi respuesta fue: '{user_answer}'."}
+                    {"role": "user", "content": user_message}
                 ],
                 max_tokens=100
             )
             return chat_completion.choices[0].message.content
         except Exception as e:
-            print(f"Error en la llamada a la API de DeepSeek: {e}")
-            return "Hubo un error al contactar con el servicio de IA."
+            print(config.get_text("deepseek_api_error", "Error en la llamada a la API de DeepSeek: {error}").format(error=str(e)))
+            return config.get_text("api_error", "Hubo un error al contactar con el servicio de IA.")

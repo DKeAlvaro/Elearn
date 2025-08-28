@@ -9,7 +9,7 @@ from views.home_view import HomeView
 from views.lesson_view import LessonView
 
 def main(page: ft.Page):
-    page.title = "App de Idiomas"
+    page.title = config.get_text("app_title", "Language Learning App")
     
     # Mobile-optimized page settings
     page.window_width = 400
@@ -27,10 +27,10 @@ def main(page: ft.Page):
     }
     
     # --- Inicialización ---
-    data_manager = DataManager("lessons.json")
+    # DataManager now automatically uses the current language configuration
+    data_manager = DataManager()
     app_state = AppState(data_manager)
     llm_client = LLMClient()
-
 
     # --- Enrutamiento ---
     def route_change(route):
@@ -50,7 +50,6 @@ def main(page: ft.Page):
     page.on_route_change = route_change
     page.on_view_pop = view_pop
     page.go(page.route)
-
 
 if __name__ == "__main__":
     ft.app(target=main)#, view=ft.AppView.WEB_BROWSER)
