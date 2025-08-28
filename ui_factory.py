@@ -114,22 +114,3 @@ def create_slide_content(slide_data: dict):
         expand=True
     )
     return {"container": content_column}
-
-# --- Componente reutilizable para los mensajes del chat ---
-class ChatMessage(ft.Row):
-    def __init__(self, message: str, is_user: bool):
-        super().__init__()
-        self.vertical_alignment = ft.CrossAxisAlignment.START
-        self.controls = [
-            ft.CircleAvatar(
-                content=ft.Icon(ft.Icons.PERSON if is_user else ft.Icons.ANDROID),
-                bgcolor=ft.Colors.BLUE_GREY_100 if is_user else ft.Colors.TEAL_200,
-            ),
-            ft.Container(
-                content=ft.Text(message, selectable=True),
-                padding=10,
-                border_radius=10,
-                bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.BLACK) if is_user else ft.Colors.with_opacity(0.05, ft.Colors.BLACK),
-                expand=True,
-            ),
-        ]

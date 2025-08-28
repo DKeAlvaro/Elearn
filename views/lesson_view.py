@@ -1,10 +1,14 @@
 # views/lesson_view.py
 import flet as ft
 from app_state import AppState
-from ui_factory import create_slide_content, ChatMessage
+from ui_factory import create_slide_content
+# +++ NEW IMPORTS +++
+from ui_components import ChatMessage, LoadingMessage 
+from utils.typing_simulator import simulate_typing
 from llm_client import LLMClient
 import json
 import re
+import asyncio
 
 class LessonView(ft.View):
     def __init__(self, page: ft.Page, app_state: AppState, llm_client: LLMClient):
@@ -13,7 +17,6 @@ class LessonView(ft.View):
         self.app_state = app_state
         self.llm_client = llm_client
         
-        # --- Estado específico del escenario ---
         self.chat_history = []
         self.required_concepts = []
         self.covered_concepts = set()
@@ -62,9 +65,8 @@ class LessonView(ft.View):
         
         self.page.update()
 
-    # +++ HEAVILY MODIFIED METHOD +++
+    # +++ FULLY REVISED METHOD with async, loading, and typing effect +++
     def handle_interactive_scenario(self, slide_elements, slide_data):
-        # Reiniciar estado para el nuevo escenario
         self.chat_history = []
         self.required_concepts = slide_data.get("required_concepts", [])
         self.covered_concepts = set()
@@ -78,57 +80,104 @@ class LessonView(ft.View):
             total = len(self.required_concepts)
             covered = len(self.covered_concepts)
             progress_text.value = f"Progreso: {covered} / {total} conceptos cubiertos"
-            if covered == total and total > 0:
+            
+            is_completed = covered == total and total > 0
+            if is_completed:
                 progress_text.value = "¡Objetivo completado!"
+                # Mark lesson as completed before clicking next
                 self.next_button.text = "Lección Completada"
+                # Disable inputs
+                send_button.disabled = True
+                new_message.disabled = True
+            
+            # This needs to be called to update the UI elements
             self.page.update()
 
-        # Resolver los IDs de los conceptos a su texto
         concepts_to_check = {
             item_id: self.app_state.data_manager.get_content_by_item_id(item_id)
             for item_id in self.required_concepts
         }
 
-        # Estado inicial
         initial_prompt = slide_data.get("initial_prompt", "Hola.")
-        chat_messages.controls.append(ChatMessage(initial_prompt, is_user=False))
+        chat_messages.controls.append(ChatMessage(ft.Text(initial_prompt, selectable=True), is_user=False))
         self.chat_history.append({"role": "assistant", "content": initial_prompt})
         update_progress_ui()
         
-        def send_message_click(e):
+        async def send_message_click(e):
             user_input = new_message.value
-            if not user_input:
+            if not user_input or send_button.disabled:
                 return
             
-            chat_messages.controls.append(ChatMessage(user_input, is_user=True))
-            self.chat_history.append({"role": "user", "content": user_input})
+            # 1. Immediately add user message and clear input
+            chat_messages.controls.append(ChatMessage(ft.Text(user_input, selectable=True), is_user=True))
             new_message.value = ""
             send_button.disabled = True
-            update_progress_ui() # Actualiza UI antes de la llamada
-
-            # Llamar al nuevo método del LLM con el contexto de los conceptos
-            persona = slide_data.get("llm_persona", "un asistente")
-            full_response = self.llm_client.get_scenario_response(persona, self.chat_history, concepts_to_check)
             
-            # --- PARSE THE STRUCTURED RESPONSE ---
-            try:
-                # Separar la línea de control de la respuesta de chat
-                control_line, chat_response = full_response.split('\n', 1)
-                
-                # Extraer la lista JSON de la línea de control
-                match = re.search(r'\[.*\]', control_line)
-                if match:
-                    newly_covered_ids = json.loads(match.group(0))
-                    for item_id in newly_covered_ids:
-                        self.covered_concepts.add(item_id)
-            except (ValueError, json.JSONDecodeError) as err:
-                print(f"Error parsing LLM response: {err}")
-                chat_response = "Hubo un error al procesar la respuesta. Inténtalo de nuevo."
+            # 2. Add loading indicator and update UI immediately
+            loading = LoadingMessage()
+            chat_messages.controls.append(loading)
+            self.page.update()  # This should show user message and loading immediately
 
-            chat_messages.controls.append(ChatMessage(chat_response, is_user=False))
-            self.chat_history.append({"role": "assistant", "content": chat_response})
-            send_button.disabled = False
-            update_progress_ui() # Actualiza UI con los nuevos conceptos cubiertos
+            # 3. Add to chat history
+            self.chat_history.append({"role": "user", "content": user_input})
+
+            # 4. Run LLM call in a separate task to avoid blocking
+            async def get_llm_response():
+                persona = slide_data.get("llm_persona", "un asistente")
+                # Wrap the synchronous LLM call in an executor to make it non-blocking
+                import concurrent.futures
+                with concurrent.futures.ThreadPoolExecutor() as executor:
+                    loop = asyncio.get_event_loop()
+                    full_response = await loop.run_in_executor(
+                        executor, 
+                        self.llm_client.get_scenario_response, 
+                        persona, 
+                        self.chat_history, 
+                        concepts_to_check
+                    )
+                return full_response
+            
+            # 5. Get the response asynchronously
+            try:
+                full_response = await get_llm_response()
+                
+                chat_response = "Hubo un error al procesar la respuesta."
+                try:
+                    control_line, parsed_response = full_response.split('\n', 1)
+                    match = re.search(r'\[.*\]', control_line)
+                    if match:
+                        newly_covered_ids = json.loads(match.group(0))
+                        for item_id in newly_covered_ids:
+                            self.covered_concepts.add(item_id)
+                    chat_response = parsed_response.strip()
+                except (ValueError, json.JSONDecodeError) as err:
+                    print(f"Error parsing LLM response: {err}")
+
+                # 6. Remove loading and prepare for typing effect
+                chat_messages.controls.remove(loading)
+                assistant_text_control = ft.Text(selectable=True)
+                chat_messages.controls.append(ChatMessage(assistant_text_control, is_user=False))
+                self.page.update()
+
+                # 7. Simulate typing the response
+                await simulate_typing(assistant_text_control, chat_response, self.page)
+
+                self.chat_history.append({"role": "assistant", "content": chat_response})
+                
+                # 8. Update progress and re-enable inputs if not completed
+                update_progress_ui()
+                if len(self.covered_concepts) < len(self.required_concepts):
+                     send_button.disabled = False
+
+                self.page.update()
+                
+            except Exception as e:
+                # Handle any errors
+                chat_messages.controls.remove(loading)
+                error_text = ft.Text(f"Error: {str(e)}", selectable=True)
+                chat_messages.controls.append(ChatMessage(error_text, is_user=False))
+                send_button.disabled = False
+                self.page.update()
 
         send_button.on_click = send_message_click
         new_message.on_submit = send_message_click
