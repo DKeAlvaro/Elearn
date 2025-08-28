@@ -1,6 +1,8 @@
 # app_state.py
 from data_manager import DataManager
 from config import THEMES
+import json
+import os
 
 class AppState:
     """Gestiona el estado global de la aplicación."""
@@ -9,6 +11,9 @@ class AppState:
         self.current_lesson_id = None
         self.current_slide_index = 0
         self.current_theme_index = 0 # Nuevo
+        self.completed_lessons = set()  # Track completed lessons
+        self.progress_file = "progress.json"  # File to persist progress
+        self.load_progress()
 
     def select_lesson(self, lesson_id: str):
         """Selecciona una lección para empezar."""
@@ -48,3 +53,34 @@ class AppState:
     def cycle_theme(self):
         """Cambia al siguiente tema de la lista."""
         self.current_theme_index = (self.current_theme_index + 1) % len(THEMES)
+    
+    def mark_lesson_completed(self, lesson_id: str):
+        """Marca una lección como completada."""
+        self.completed_lessons.add(lesson_id)
+        self.save_progress()
+    
+    def is_lesson_completed(self, lesson_id: str) -> bool:
+        """Verifica si una lección está completada."""
+        return lesson_id in self.completed_lessons
+    
+    def load_progress(self):
+        """Carga el progreso desde el archivo."""
+        try:
+            if os.path.exists(self.progress_file):
+                with open(self.progress_file, 'r', encoding='utf-8') as f:
+                    data = json.load(f)
+                    self.completed_lessons = set(data.get('completed_lessons', []))
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            print(f"Error loading progress: {e}")
+            self.completed_lessons = set()
+    
+    def save_progress(self):
+        """Guarda el progreso al archivo."""
+        try:
+            data = {
+                'completed_lessons': list(self.completed_lessons)
+            }
+            with open(self.progress_file, 'w', encoding='utf-8') as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print(f"Error saving progress: {e}")

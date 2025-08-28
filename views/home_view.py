@@ -1,6 +1,6 @@
 import flet as ft
 from app_state import AppState
-3
+
 def HomeView(page: ft.Page, app_state: AppState):
 
     def start_lesson(e):
@@ -12,11 +12,30 @@ def HomeView(page: ft.Page, app_state: AppState):
     lesson_cards = []
     
     for lesson in lessons:
+        lesson_id = lesson.get("id")
+        is_completed = app_state.is_lesson_completed(lesson_id)
+        
+        # Create completion indicator
+        completion_indicator = ft.Icon(
+            ft.Icons.CHECK_CIRCLE,
+            color=ft.Colors.GREEN,
+            size=24
+        ) if is_completed else ft.Icon(
+            ft.Icons.RADIO_BUTTON_UNCHECKED,
+            color=ft.Colors.GREY_400,
+            size=24
+        )
+        
+        # Button text changes based on completion
+        button_text = "Repasar" if is_completed else "Comenzar"
+        button_color = ft.Colors.BLUE_GREY if is_completed else None
+        
         # Modern card-based design for lessons
         lesson_card = ft.Card(
             content=ft.Container(
                 content=ft.Column([
                     ft.Row([
+                        completion_indicator,
                         ft.Text(
                             lesson.get("title"),
                             size=18,
@@ -26,9 +45,10 @@ def HomeView(page: ft.Page, app_state: AppState):
                     ], alignment=ft.MainAxisAlignment.START),
                     ft.Container(
                         content=ft.ElevatedButton(
-                            text="Comenzar",
+                            text=button_text,
                             on_click=start_lesson,
-                            data=lesson.get("id"),
+                            data=lesson_id,
+                            color=button_color,
                             style=ft.ButtonStyle(
                                 shape=ft.RoundedRectangleBorder(radius=12),
                                 padding=ft.padding.symmetric(horizontal=24, vertical=12)

@@ -52,6 +52,17 @@ class LessonView(ft.View):
         is_last_slide = self.app_state.current_slide_index == len(lesson_content) - 1
         self.next_button.text = "Finalizar" if is_last_slide else "Siguiente"
         self.previous_button.visible = self.app_state.current_slide_index > 0
+        
+        # Disable 'Finalizar' button by default on last slide
+        if is_last_slide:
+            slide_type = current_slide_data.get("type")
+            # Only disable for interactive scenarios and llm_check types
+            if slide_type in ["interactive_scenario", "llm_check"]:
+                self.next_button.disabled = True
+            else:
+                self.next_button.disabled = False
+        else:
+            self.next_button.disabled = False
 
         slide_elements = create_slide_content(current_slide_data)
         self.slide_content_area.content = slide_elements["container"]
@@ -84,11 +95,21 @@ class LessonView(ft.View):
             is_completed = covered == total and total > 0
             if is_completed:
                 progress_text.value = "¡Objetivo completado!"
-                # Mark lesson as completed before clicking next
-                self.next_button.text = "Lección Completada"
+                # Enable the Finalizar button when interactive scenario is completed
+                lesson_content = self.app_state.data_manager.get_lesson_content(self.app_state.current_lesson_id)
+                is_last_slide = self.app_state.current_slide_index == len(lesson_content) - 1
+                if is_last_slide:
+                    self.next_button.disabled = False
+                    self.next_button.text = "Finalizar"
                 # Disable inputs
                 send_button.disabled = True
                 new_message.disabled = True
+            else:
+                # Keep Finalizar button disabled if not completed
+                lesson_content = self.app_state.data_manager.get_lesson_content(self.app_state.current_lesson_id)
+                is_last_slide = self.app_state.current_slide_index == len(lesson_content) - 1
+                if is_last_slide:
+                    self.next_button.disabled = True
             
             # This needs to be called to update the UI elements
             self.page.update()
@@ -200,6 +221,13 @@ class LessonView(ft.View):
             
             result_text.value = correction
             check_button.disabled = False
+            
+            # Enable Finalizar button after getting correction (assuming completion)
+            lesson_content = self.app_state.data_manager.get_lesson_content(self.app_state.current_lesson_id)
+            is_last_slide = self.app_state.current_slide_index == len(lesson_content) - 1
+            if is_last_slide:
+                self.next_button.disabled = False
+            
             self.page.update()
 
         check_button.on_click = check_answer_click
@@ -209,7 +237,13 @@ class LessonView(ft.View):
             self.update_slide_content()
 
     def go_next(self, e):
+        # Don't proceed if button is disabled
+        if self.next_button.disabled:
+            return
+            
         if self.app_state.next_slide():
             self.update_slide_content()
         else:
+            # Mark lesson as completed when finishing
+            self.app_state.mark_lesson_completed(self.app_state.current_lesson_id)
             self.page.go('/')
