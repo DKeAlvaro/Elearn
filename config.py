@@ -1,7 +1,11 @@
 # config.py
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # --- Configuración del LLM ---
-DEEPSEEK_API_KEY = "sk-c3365d714ebf4fc2aa3dc3c009b04cfd" 
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 DEEPSEEK_BASE_URL = "https://api.deepseek.com"
 
 # --- Modern Material Design 3 Color Schemes ---
