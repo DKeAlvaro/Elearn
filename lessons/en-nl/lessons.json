@@ -13,8 +13,10 @@
       "content": [
         { "type": "vocabulary", "item_id": "L01_V01", "data": { "Water": "Water" } },
         { "type": "vocabulary", "item_id": "L01_V02", "data": { "Brood": "Bread" } },
+        { "type": "vocabulary", "item_id": "L01_V03", "data": { "Soep": "Soup" } },
         { "type": "tip", "text": "In the Netherlands, when ordering water at a restaurant, bottled water is usually served rather than tap water." },
         { "type": "expression", "item_id": "L01_E01", "data": { "phrase": "Mag ik water, alstublieft?", "meaning": "May I have water, please?" } },
+        { "type": "expression", "item_id": "L01_E02", "data": { "phrase": "Ik wil brood.", "meaning": "I want bread." } },
         { "type": "grammar", "item_id": "L01_G01", "title": "Using 'mag ik...'", "explanation": "The expression 'mag ik...' means 'may I have...?'. It's a polite way to ask for something." },
         {
           "type": "interactive_scenario",
@@ -33,11 +35,103 @@
       "id": "L02",
       "title": "In the park",
       "icon": "park",
+      "key_concepts": ["Hond", "Boom", "Fiets", "Wat mooi!"],
       "content": [
-        { "type": "vocabulary", "data": { "Hond": "Dog" } },
-        { "type": "vocabulary", "data": { "Boom": "Tree" } },
-        { "type": "expression", "data": { "phrase": "Wat mooi!", "meaning": "How beautiful!" } },
-        { "type": "tip", "text": "In Dutch, 'oo' is pronounced as a long 'o', similar to 'oo' in 'boot'." }
+        { "type": "vocabulary", "item_id": "L02_V01", "data": { "Hond": "Dog" } },
+        { "type": "vocabulary", "item_id": "L02_V02", "data": { "Boom": "Tree" } },
+        { "type": "vocabulary", "item_id": "L02_V03", "data": { "Fiets": "Bicycle" } },
+        { "type": "expression", "item_id": "L02_E01", "data": { "phrase": "Wat mooi!", "meaning": "How beautiful!" } },
+        { "type": "tip", "text": "In Dutch, 'oo' is pronounced as a long 'o', similar to 'oo' in 'boot'." },
+        { "type": "grammar", "item_id": "L02_G01", "title": "Exclamations with 'wat...'", "explanation": "The word 'wat' can be used to make exclamations: 'Wat mooi!' (How beautiful!), 'Wat lekker!' (How tasty!)." },
+        {
+          "type": "interactive_scenario",
+          "scenario_id": "L02_S01",
+          "title": "Enjoy the park",
+          "setting": "You are walking in a Dutch park and see trees, dogs, and bicycles.",
+          "user_goal": "Point out things you see and use 'Wat mooi!' when appropriate.",
+          "llm_persona": "Act as a friendly Dutch local walking their dog. Respond with short, encouraging Dutch sentences.",
+          "initial_prompt": "Hallo! Mooie dag in het park, toch?",
+          "required_concepts": ["L02_V01", "L02_V02", "L02_E01"],
+          "success_condition": "The user describes at least one thing they see and uses 'Wat mooi!'."
+        }
+      ]
+    },
+    {
+      "id": "L03",
+      "title": "At the supermarket",
+      "icon": "shopping_cart",
+      "key_concepts": ["Melk", "Kaas", "Waar is", "Dank u"],
+      "content": [
+        { "type": "vocabulary", "item_id": "L03_V01", "data": { "Melk": "Milk" } },
+        { "type": "vocabulary", "item_id": "L03_V02", "data": { "Kaas": "Cheese" } },
+        { "type": "vocabulary", "item_id": "L03_V03", "data": { "Boter": "Butter" } },
+        { "type": "expression", "item_id": "L03_E01", "data": { "phrase": "Waar is de melk?", "meaning": "Where is the milk?" } },
+        { "type": "expression", "item_id": "L03_E02", "data": { "phrase": "Dank u wel.", "meaning": "Thank you." } },
+        { "type": "grammar", "item_id": "L03_G01", "title": "Using 'waar is...'", "explanation": "The phrase 'waar is...' means 'where is...'. You can use it to ask where something is located." },
+        { "type": "tip", "text": "Dutch supermarkets often have a large dairy section with many kinds of cheese." },
+        {
+          "type": "interactive_scenario",
+          "scenario_id": "L03_S01",
+          "title": "Find the groceries",
+          "setting": "You are in a Dutch supermarket looking for milk and cheese.",
+          "user_goal": "Ask where items are and thank the staff.",
+          "llm_persona": "Act as a helpful supermarket employee, answering politely in Dutch.",
+          "initial_prompt": "Goedemiddag! Kan ik u helpen?",
+          "required_concepts": ["L03_V01", "L03_V02", "L03_E01"],
+          "success_condition": "The user successfully asks where the milk and cheese are and thanks the employee."
+        }
+      ]
+    },
+    {
+      "id": "L04",
+      "title": "Taking the train",
+      "icon": "train",
+      "key_concepts": ["Station", "Kaartje", "Naar", "Hoeveel kost"],
+      "content": [
+        { "type": "vocabulary", "item_id": "L04_V01", "data": { "Station": "Station" } },
+        { "type": "vocabulary", "item_id": "L04_V02", "data": { "Kaartje": "Ticket" } },
+        { "type": "vocabulary", "item_id": "L04_V03", "data": { "Trein": "Train" } },
+        { "type": "expression", "item_id": "L04_E01", "data": { "phrase": "Een kaartje naar Utrecht, alstublieft.", "meaning": "A ticket to Utrecht, please." } },
+        { "type": "expression", "item_id": "L04_E02", "data": { "phrase": "Hoeveel kost het?", "meaning": "How much does it cost?" } },
+        { "type": "grammar", "item_id": "L04_G01", "title": "Using 'naar...'", "explanation": "The preposition 'naar' means 'to'. You use it with destinations, e.g. 'naar Utrecht' (to Utrecht)." },
+        { "type": "tip", "text": "Dutch trains are often punctual. Always check the platform ('perron') before boarding." },
+        {
+          "type": "interactive_scenario",
+          "scenario_id": "L04_S01",
+          "title": "Buy a train ticket",
+          "setting": "You are at a train station in the Netherlands.",
+          "user_goal": "Ask for a ticket to Utrecht and find out the price.",
+          "llm_persona": "Act as a ticket clerk at the station, answering politely in Dutch.",
+          "initial_prompt": "Goedemorgen! Waar wilt u naartoe?",
+          "required_concepts": ["L04_V02", "L04_E01", "L04_E02"],
+          "success_condition": "The user correctly asks for a ticket to Utrecht and asks how much it costs."
+        }
+      ]
+    },
+    {
+      "id": "L05",
+      "title": "Meeting people",
+      "icon": "people",
+      "key_concepts": ["Hallo", "Hoe gaat het?", "Ik heet", "Leuk je te ontmoeten"],
+      "content": [
+        { "type": "vocabulary", "item_id": "L05_V01", "data": { "Hallo": "Hello" } },
+        { "type": "vocabulary", "item_id": "L05_V02", "data": { "Vriend": "Friend" } },
+        { "type": "expression", "item_id": "L05_E01", "data": { "phrase": "Hoe gaat het?", "meaning": "How are you?" } },
+        { "type": "expression", "item_id": "L05_E02", "data": { "phrase": "Ik heet Anna.", "meaning": "My name is Anna." } },
+        { "type": "expression", "item_id": "L05_E03", "data": { "phrase": "Leuk je te ontmoeten.", "meaning": "Nice to meet you." } },
+        { "type": "grammar", "item_id": "L05_G01", "title": "Introducing yourself", "explanation": "The phrase 'ik heet...' means 'my name is...'. You can introduce yourself this way in Dutch." },
+        { "type": "tip", "text": "When greeting in the Netherlands, a handshake is common in formal situations. Among friends, three cheek kisses are traditional." },
+        {
+          "type": "interactive_scenario",
+          "scenario_id": "L05_S01",
+          "title": "Meet someone new",
+          "setting": "You meet someone for the first time at a social event.",
+          "user_goal": "Greet them, ask how they are, and introduce yourself.",
+          "llm_persona": "Act as a friendly Dutch person meeting someone new. Respond with short, natural Dutch sentences.",
+          "initial_prompt": "Hallo! Hoe gaat het?",
+          "required_concepts": ["L05_E01", "L05_E02", "L05_E03"],
+          "success_condition": "The user greets, asks how the other person is, and introduces themselves."
+        }
       ]
     }
   ]
