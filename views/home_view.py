@@ -101,11 +101,20 @@ def HomeView(page: ft.Page, app_state: AppState):
         "/",
         controls=[
             ft.AppBar(
-                title=ft.Text(
-                    config.get_text("choose_lesson", "Elige una lección"),
-                    size=20,
-                    weight=ft.FontWeight.W_600
-                ),
+                title=ft.Row([
+                    ft.Image(
+                        src="assets/logo.svg",
+                        width=32,
+                        height=32,
+                        fit=ft.ImageFit.CONTAIN
+                    ),
+                    ft.Container(width=12),
+                    ft.Text(
+                        config.get_text("choose_lesson", "Elige una lección"),
+                        size=20,
+                        weight=ft.FontWeight.W_600
+                    )
+                ], alignment=ft.MainAxisAlignment.CENTER),
                 center_title=True,
                 bgcolor=ft.Colors.TRANSPARENT,
                 elevation=0,

@@ -32,7 +32,26 @@ class LessonView(ft.View):
         self.next_button = ft.ElevatedButton(on_click=self.go_next)
 
         self.controls = [
-            ft.AppBar(title=ft.Text(self.app_state.get_current_lesson_title())),
+            ft.AppBar(
+                title=ft.Row([
+                    ft.Image(
+                        src="assets/logo.svg",
+                        width=24,
+                        height=24,
+                        fit=ft.ImageFit.CONTAIN
+                    ),
+                    ft.Container(width=8),
+                    ft.Container(
+                        content=ft.Text(
+                            self.app_state.get_current_lesson_title(),
+                            overflow=ft.TextOverflow.ELLIPSIS,
+                            max_lines=1
+                        ),
+                        expand=True
+                    )
+                ], alignment=ft.MainAxisAlignment.CENTER),
+                center_title=True
+            ),
             self.slide_content_area,
             ft.Row(
                 [self.previous_button, self.next_button],

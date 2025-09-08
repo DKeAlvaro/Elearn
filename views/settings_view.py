@@ -124,11 +124,20 @@ def SettingsView(page: ft.Page, llm_client=None):
         "/settings",
         controls=[
             ft.AppBar(
-                title=ft.Text(
-                    config.get_text("settings", "Settings"),
-                    size=20,
-                    weight=ft.FontWeight.W_600
-                ),
+                title=ft.Row([
+                    ft.Image(
+                        src="assets/logo.svg",
+                        width=28,
+                        height=28,
+                        fit=ft.ImageFit.CONTAIN
+                    ),
+                    ft.Container(width=10),
+                    ft.Text(
+                        config.get_text("settings", "Settings"),
+                        size=20,
+                        weight=ft.FontWeight.W_600
+                    )
+                ], alignment=ft.MainAxisAlignment.CENTER),
                 leading=ft.IconButton(
                     icon=ft.Icons.ARROW_BACK,
                     on_click=go_back

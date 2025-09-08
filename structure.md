@@ -26,7 +26,7 @@ The application follows a simple design pattern where the **UI is a reflection o
 
 ### **main.py**
 - **Purpose**: Entry point of the application.  
-- **Responsibilities**: Initializes Flet, `AppState`, `DataManager`, and `LLMClient`. Manages routing and global theme switching.  
+- **Responsibilities**: Initializes Flet, `AppState`, `DataManager`, and `LLMClient`. Manages routing and global theme switching. Displays loading screen with logo and sets app icon.  
 
 ### **config.py**
 - **Purpose**: Store configurations and secrets.  
@@ -50,11 +50,20 @@ The application follows a simple design pattern where the **UI is a reflection o
 
 ### **ui_factory.py**
 - **Purpose**: Convert JSON data into Flet components.  
-- **Responsibilities**: Map slide `type` (e.g. `"vocabulary"`) to specific controls (`ft.Text`, `ft.Column`, etc.).  
+- **Responsibilities**: Map slide `type` (e.g. `"vocabulary"`) to specific controls (`ft.Text`, `ft.Column`, etc.).
+
+### **ui_components.py**
+- **Purpose**: Reusable UI components for the application.
+- **Responsibilities**: Provides `ChatMessage` and `LoadingMessage` components. Both use the app logo for AI assistant avatars.
+
+### **assets/logo.svg**
+- **Purpose**: Application logo and branding.
+- **Responsibilities**: Used as app icon, loading screen logo, AI assistant avatar, and in all app bar headers throughout the application.  
 
 ### **views/**
-- **home_view.py**: Defines the home screen with a list of lessons.  
-- **lesson_view.py**: Defines the lesson screen. Manages its own internal state to update slides without reloading the entire view.  
+- **home_view.py**: Defines the home screen with a list of lessons. Features logo in the app bar header.  
+- **lesson_view.py**: Defines the lesson screen. Manages its own internal state to update slides without reloading the entire view. Includes logo in the app bar.
+- **settings_view.py**: Defines the settings screen for API key configuration. Features logo in the app bar header.  
 
 ---
 
@@ -100,6 +109,7 @@ The app will automatically include it in the theme rotation.
 - [ ] Implement final open conversation with LLM (with a personality prompt, e.g. "you are a waiter").  
 
 ### UI/UX Improvements
+- [x] **Logo Integration**: Added logo as app icon, loading screen, AI assistant avatar, and in all app bar headers.
 - [ ] Add animations with `ft.Animation`.  
 - [ ] Add audio playback button for vocabulary slides.  
 - [ ] Provide visual feedback for correct/incorrect answers.  

@@ -9,13 +9,25 @@ class ChatMessage(ft.Row):
     def __init__(self, message_control: ft.Control, is_user: bool):
         super().__init__()
         self.vertical_alignment = ft.CrossAxisAlignment.START
-        avatar_icon = ft.Icons.PERSON if is_user else ft.Icons.ANDROID
-        avatar_color = ft.Colors.BLUE_GREY_100 if is_user else ft.Colors.TEAL_200
         message_bgcolor = ft.Colors.with_opacity(0.1, ft.Colors.BLACK) if is_user else ft.Colors.with_opacity(0.05, ft.Colors.BLACK)
+
+        # Use different avatars for user vs AI assistant
+        if is_user:
+            avatar_content = ft.Icon(ft.Icons.PERSON)
+            avatar_color = ft.Colors.BLUE_GREY_100
+        else:
+            # Use logo for AI assistant
+            avatar_content = ft.Image(
+                src="assets/logo.svg",
+                width=24,
+                height=24,
+                fit=ft.ImageFit.CONTAIN
+            )
+            avatar_color = ft.Colors.TEAL_200
 
         self.controls = [
             ft.CircleAvatar(
-                content=ft.Icon(avatar_icon),
+                content=avatar_content,
                 bgcolor=avatar_color,
             ),
             ft.Container(
@@ -37,7 +49,12 @@ class LoadingMessage(ft.Row):
         self.vertical_alignment = ft.CrossAxisAlignment.START
         self.controls = [
             ft.CircleAvatar(
-                content=ft.Icon(ft.Icons.ANDROID),
+                content=ft.Image(
+                    src="assets/logo.svg",
+                    width=24,
+                    height=24,
+                    fit=ft.ImageFit.CONTAIN
+                ),
                 bgcolor=ft.Colors.TEAL_200,
             ),
             ft.Container(

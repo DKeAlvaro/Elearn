@@ -8,6 +8,7 @@ a = Analysis(
     datas=[
         ('app_languages', 'app_languages'),
         ('lessons', 'lessons'),
+        ('assets', 'assets'),
         ('progress.json', '.'),
     ],
     hiddenimports=[],
