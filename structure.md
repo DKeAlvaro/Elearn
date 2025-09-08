@@ -100,7 +100,7 @@ The app will automatically include it in the theme rotation.
 - [ ] Implement final open conversation with LLM (with a personality prompt, e.g. "you are a waiter").  
 
 ### UI/UX Improvements
-- [ ] Add animations with `ft.animation`.  
+- [ ] Add animations with `ft.Animation`.  
 - [ ] Add audio playback button for vocabulary slides.  
 - [ ] Provide visual feedback for correct/incorrect answers.  
 - [ ] Improve phrase-building slides with drag-and-drop interaction.  

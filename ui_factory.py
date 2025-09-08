@@ -98,6 +98,17 @@ def create_slide_content(slide_data: dict):
             ft.Text(slide_data['content'], size=18, text_align=ft.TextAlign.CENTER)
         ])
         
+    elif slide_type == 'pronunciation':
+        word = slide_data['data']['word']
+        phonetic = slide_data['data']['phonetic']
+        tip = slide_data['data']['tip']
+        content_controls.extend([
+            ft.Text(word, size=50, weight=ft.FontWeight.BOLD, text_align=ft.TextAlign.CENTER),
+            ft.Text(f"[{phonetic}]", size=24, italic=True, text_align=ft.TextAlign.CENTER, color=ft.Colors.BLUE_700),
+            ft.Icon(ft.Icons.VOLUME_UP, size=30, color=ft.Colors.BLUE_500),
+            ft.Text(tip, size=16, text_align=ft.TextAlign.CENTER, color=ft.Colors.GREY_700)
+        ])
+        
     else:
         content_controls.append(ft.Text(f"Tipo de diapositiva desconocido: {slide_type}"))
 

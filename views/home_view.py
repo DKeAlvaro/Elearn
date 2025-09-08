@@ -9,6 +9,10 @@ def HomeView(page: ft.Page, app_state: AppState):
         lesson_id = e.control.data
         app_state.select_lesson(lesson_id)
         page.go("/lesson")
+    
+    def go_to_settings(e):
+        """Navigate to settings page"""
+        page.go("/settings")
 
     lessons = app_state.data_manager.get_lessons()
     lesson_cards = []
@@ -78,7 +82,14 @@ def HomeView(page: ft.Page, app_state: AppState):
                 ),
                 center_title=True,
                 bgcolor=ft.Colors.TRANSPARENT,
-                elevation=0
+                elevation=0,
+                actions=[
+                    ft.IconButton(
+                        icon=ft.Icons.SETTINGS,
+                        tooltip=config.get_text("settings", "Settings"),
+                        on_click=go_to_settings
+                    )
+                ]
             ),
             ft.Container(
                 content=ft.Column(

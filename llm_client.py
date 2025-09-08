@@ -8,7 +8,19 @@ class LLMClient:
     def __init__(self):
         try:
             self.client = OpenAI(
-                api_key=config.DEEPSEEK_API_KEY,
+                api_key=config.get_effective_api_key(),
+                base_url=config.DEEPSEEK_BASE_URL
+            )
+            self.active = True
+        except Exception as e:
+            print(config.get_text("llm_init_error", "Error al inicializar el cliente de OpenAI: {error}").format(error=str(e)))
+            self.active = False
+    
+    def update_api_key(self):
+        """Update the API key for the client"""
+        try:
+            self.client = OpenAI(
+                api_key=config.get_effective_api_key(),
                 base_url=config.DEEPSEEK_BASE_URL
             )
             self.active = True
@@ -21,7 +33,7 @@ class LLMClient:
         """
         Obtiene una respuesta del LLM para un escenario, pidiéndole que evalúe los conceptos.
         """
-        if not self.active or not config.DEEPSEEK_API_KEY or config.DEEPSEEK_API_KEY == "TU_API_KEY":
+        if not self.active or not config.get_effective_api_key():
             return f"CONCEPTS_COVERED: []\n{config.get_text('llm_not_configured_scenario', 'El cliente LLM no está configurado.')}"
 
         # Convertir el dict de conceptos a un string para el prompt
@@ -47,7 +59,7 @@ class LLMClient:
             return f"CONCEPTS_COVERED: []\n{config.get_text('api_error_scenario', 'Hubo un error al contactar con el servicio de IA.')}"
 
     def get_correction(self, user_answer: str, prompt_question: str):
-        if not self.active or config.DEEPSEEK_API_KEY == "TU_API_KEY":
+        if not self.active or not config.get_effective_api_key():
             return config.get_text("llm_not_configured", "El cliente LLM no está configurado. Por favor, añade tu API key en config.py")
 
         system_prompt = config.get_text(

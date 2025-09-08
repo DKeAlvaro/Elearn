@@ -7,6 +7,7 @@ from app_state import AppState
 from llm_client import LLMClient
 from views.home_view import HomeView
 from views.lesson_view import LessonView
+from views.settings_view import SettingsView
 
 def main(page: ft.Page):
     page.title = config.get_text("app_title", "Language Learning App")
@@ -39,6 +40,8 @@ def main(page: ft.Page):
 
         if page.route == "/lesson":
             page.views.append(LessonView(page, app_state, llm_client))
+        elif page.route == "/settings":
+            page.views.append(SettingsView(page, llm_client))
         
         page.update()
 

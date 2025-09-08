@@ -9,6 +9,12 @@ load_dotenv()
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
 DEEPSEEK_BASE_URL = "https://api.deepseek.com"
 
+# User settings file
+USER_SETTINGS_FILE = "user_settings.json"
+
+# Runtime API key (can be updated by user)
+_runtime_api_key = None
+
 # --- Unified Language Configuration ---
 # This single setting controls both UI language and lesson language
 # Available options: "es-nl" (Spanish UI + Spanish->Dutch lessons) or "en-nl" (English UI + English->Dutch lessons)
@@ -73,6 +79,66 @@ def get_language_info():
 
 # Initialize with default language
 load_language()
+
+# --- User API Key Management ---
+def load_user_settings():
+    """Load user settings from file"""
+    try:
+        if os.path.exists(USER_SETTINGS_FILE):
+            with open(USER_SETTINGS_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception as e:
+        print(f"Error loading user settings: {e}")
+    return {}
+
+def save_user_settings(settings):
+    """Save user settings to file"""
+    try:
+        with open(USER_SETTINGS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(settings, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"Error saving user settings: {e}")
+        raise
+
+def get_user_api_key():
+    """Get user's saved API key"""
+    settings = load_user_settings()
+    return settings.get('deepseek_api_key')
+
+def save_user_api_key(api_key):
+    """Save user's API key"""
+    settings = load_user_settings()
+    settings['deepseek_api_key'] = api_key
+    save_user_settings(settings)
+
+def clear_user_api_key():
+    """Clear user's saved API key"""
+    settings = load_user_settings()
+    if 'deepseek_api_key' in settings:
+        del settings['deepseek_api_key']
+    save_user_settings(settings)
+
+def get_effective_api_key():
+    """Get the effective API key (user's key takes precedence over environment)"""
+    global _runtime_api_key
+    if _runtime_api_key:
+        return _runtime_api_key
+    
+    user_key = get_user_api_key()
+    if user_key:
+        return user_key
+    
+    return DEEPSEEK_API_KEY
+
+def update_runtime_api_key(api_key):
+    """Update the runtime API key"""
+    global _runtime_api_key
+    _runtime_api_key = api_key
+
+# Initialize runtime API key with user's saved key if available
+user_saved_key = get_user_api_key()
+if user_saved_key:
+    _runtime_api_key = user_saved_key
 
 # --- Modern Material Design 3 Color Schemes ---
 THEMES = [
