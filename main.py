@@ -51,18 +51,18 @@ def main(page: ft.Page):
         "Poppins": "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
     }
     
-    # Simulate loading time
-    import time
-    time.sleep(2)
-    
-    # Remove loading screen
-    page.clean()
-    
     # --- Inicialización ---
     # DataManager now automatically uses the current language configuration
     data_manager = DataManager()
     app_state = AppState(data_manager)
     llm_client = LLMClient()
+    
+    # Add a small delay to ensure loading screen is visible
+    import time
+    time.sleep(1)
+    
+    # Remove loading screen after initialization
+    page.clean()
 
     # --- Enrutamiento ---
     def route_change(route):
@@ -86,4 +86,4 @@ def main(page: ft.Page):
     page.go(page.route)
 
 if __name__ == "__main__":
-    ft.app(target=main)#, view=ft.AppView.WEB_BROWSER)
+    ft.app(target=main, view=ft.AppView.WEB_BROWSER)

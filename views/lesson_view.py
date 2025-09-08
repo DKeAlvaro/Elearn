@@ -33,23 +33,26 @@ class LessonView(ft.View):
 
         self.controls = [
             ft.AppBar(
-                title=ft.Row([
-                    ft.Image(
-                        src="assets/logo.svg",
-                        width=24,
-                        height=24,
-                        fit=ft.ImageFit.CONTAIN
-                    ),
-                    ft.Container(width=8),
-                    ft.Container(
-                        content=ft.Text(
-                            self.app_state.get_current_lesson_title(),
-                            overflow=ft.TextOverflow.ELLIPSIS,
-                            max_lines=1
+                title=ft.Column([
+                    ft.Row([
+                        ft.Image(
+                            src="assets/logo.svg",
+                            width=24,
+                            height=24,
+                            fit=ft.ImageFit.CONTAIN
                         ),
-                        expand=True
-                    )
-                ], alignment=ft.MainAxisAlignment.CENTER),
+                        ft.Container(width=4),
+                        ft.Container(
+                            content=ft.Text(
+                                self.app_state.get_current_lesson_title(),
+                                text_align=ft.TextAlign.CENTER,
+                                size=16,
+                                weight=ft.FontWeight.W_500
+                            ),
+                            expand=True
+                        )
+                    ], alignment=ft.MainAxisAlignment.CENTER)
+                ], spacing=0, tight=True),
                 center_title=True
             ),
             self.slide_content_area,
