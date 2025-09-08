@@ -16,13 +16,31 @@ def create_slide_content(slide_data: dict):
         chat_messages = ft.ListView(expand=True, spacing=10, auto_scroll=True)
         new_message = ft.TextField(label=config.get_text("type_message", "Escribe tu mensaje..."), expand=True)
         send_button = ft.ElevatedButton(config.get_text("send_message", "Enviar"))
+        # Create a scrollable container that includes title, objectives, progress, and messages
+        scrollable_content = ft.ListView(
+            controls=[
+                ft.Container(
+                    content=ft.Text(slide_data.get('title', 'Conversación'), size=24, weight=ft.FontWeight.BOLD),
+                    padding=ft.padding.only(bottom=10)
+                ),
+                ft.Container(
+                    content=ft.Text(f"{config.get_text("objective_text")} {slide_data.get('user_goal')}", size=16),
+                    padding=ft.padding.only(bottom=10)
+                ),
+                ft.Container(
+                    content=progress_text,
+                    padding=ft.padding.only(bottom=10)
+                ),
+                ft.Divider(),
+            ],
+            expand=True,
+            spacing=10,
+            auto_scroll=True
+        )
+        
         container = ft.Column(
             controls=[
-                ft.Text(slide_data.get('title', 'Conversación'), size=24, weight=ft.FontWeight.BOLD),
-                ft.Text(f"{config.get_text("objective_text")} {slide_data.get('user_goal')}", size=16),
-                progress_text,
-                ft.Divider(),
-                chat_messages,
+                scrollable_content,
                 ft.Row(
                     controls=[new_message, send_button],
                     vertical_alignment=ft.CrossAxisAlignment.CENTER
@@ -34,7 +52,7 @@ def create_slide_content(slide_data: dict):
         # +++ RETURN the new control +++
         return {
             "container": container, 
-            "chat_messages": chat_messages, 
+            "scrollable_content": scrollable_content, 
             "new_message": new_message, 
             "send_button": send_button,
             "progress_text": progress_text

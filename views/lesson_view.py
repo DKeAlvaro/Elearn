@@ -105,7 +105,7 @@ class LessonView(ft.View):
         self.required_concepts = slide_data.get("required_concepts", [])
         self.covered_concepts = set()
         
-        chat_messages = slide_elements["chat_messages"]
+        scrollable_content = slide_elements["scrollable_content"]
         new_message = slide_elements["new_message"]
         send_button = slide_elements["send_button"]
         progress_text = slide_elements["progress_text"]
@@ -143,7 +143,7 @@ class LessonView(ft.View):
         }
 
         initial_prompt = slide_data.get("initial_prompt", "Hola.")
-        chat_messages.controls.append(ChatMessage(ft.Text(initial_prompt, selectable=True), is_user=False))
+        scrollable_content.controls.append(ChatMessage(ft.Text(initial_prompt, selectable=True), is_user=False))
         self.chat_history.append({"role": "assistant", "content": initial_prompt})
         update_progress_ui()
         
@@ -153,13 +153,13 @@ class LessonView(ft.View):
                 return
             
             # 1. Immediately add user message and clear input
-            chat_messages.controls.append(ChatMessage(ft.Text(user_input, selectable=True), is_user=True))
+            scrollable_content.controls.append(ChatMessage(ft.Text(user_input, selectable=True), is_user=True))
             new_message.value = ""
             send_button.disabled = True
             
             # 2. Add loading indicator and update UI immediately
             loading = LoadingMessage()
-            chat_messages.controls.append(loading)
+            scrollable_content.controls.append(loading)
             self.page.update()  # This should show user message and loading immediately
 
             # 3. Add to chat history
@@ -198,9 +198,9 @@ class LessonView(ft.View):
                     print(f"Error parsing LLM response: {err}")
 
                 # 6. Remove loading and prepare for typing effect
-                chat_messages.controls.remove(loading)
+                scrollable_content.controls.remove(loading)
                 assistant_text_control = ft.Text(selectable=True)
-                chat_messages.controls.append(ChatMessage(assistant_text_control, is_user=False))
+                scrollable_content.controls.append(ChatMessage(assistant_text_control, is_user=False))
                 self.page.update()
 
                 # 7. Simulate typing the response
@@ -217,9 +217,9 @@ class LessonView(ft.View):
                 
             except Exception as e:
                 # Handle any errors
-                chat_messages.controls.remove(loading)
+                scrollable_content.controls.remove(loading)
                 error_text = ft.Text(f"Error: {str(e)}", selectable=True)
-                chat_messages.controls.append(ChatMessage(error_text, is_user=False))
+                scrollable_content.controls.append(ChatMessage(error_text, is_user=False))
                 send_button.disabled = False
                 self.page.update()
 
