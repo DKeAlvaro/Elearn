@@ -2,3 +2,5 @@
 .trae
 .env
 /build
+user_settings.json
+progress.json

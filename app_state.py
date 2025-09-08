@@ -59,6 +59,29 @@ class AppState:
         """Verifica si una lección está completada."""
         return lesson_id in self.completed_lessons
     
+    def is_lesson_unlocked(self, lesson_id: str) -> bool:
+        """Verifica si una lección está desbloqueada para ser jugada."""
+        # La primera lección (L01) siempre está desbloqueada
+        if lesson_id == "L01":
+            return True
+        
+        # Para otras lecciones, verificar que la anterior esté completada
+        lessons = self.data_manager.get_lessons()
+        lesson_index = None
+        
+        # Encontrar el índice de la lección actual
+        for i, lesson in enumerate(lessons):
+            if lesson.get("id") == lesson_id:
+                lesson_index = i
+                break
+        
+        if lesson_index is None or lesson_index == 0:
+            return True
+        
+        # Verificar que la lección anterior esté completada
+        previous_lesson = lessons[lesson_index - 1]
+        return self.is_lesson_completed(previous_lesson.get("id"))
+    
     def load_progress(self):
         """Carga el progreso desde el archivo."""
         try:
