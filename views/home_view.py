@@ -2,19 +2,35 @@
 import flet as ft
 from app_state import AppState
 import config
+from billing_manager import billing_manager
 
 def HomeView(page: ft.Page, app_state: AppState):
 
     def start_lesson(e):
         lesson_id = e.control.data
-        # Solo permitir iniciar lecciones desbloqueadas
-        if app_state.is_lesson_unlocked(lesson_id):
+        # Check if lesson is unlocked using the same logic as the UI
+        try:
+            lesson_num = int(lesson_id[1:])  # Extract number from L01, L02, etc.
+        except (ValueError, IndexError):
+            lesson_num = 999  # Default to high number if parsing fails
+        
+        # Every 3rd lesson (3, 6, 9, etc.) requires premium, others are free
+        is_premium_lesson = (lesson_num % 3 == 0)
+        is_unlocked = (not is_premium_lesson) or has_premium or app_state.is_lesson_unlocked(lesson_id)
+        
+        if is_unlocked:
             app_state.select_lesson(lesson_id)
             page.go("/lesson")
     
     def go_to_settings(e):
         """Navigate to settings page"""
         page.go("/settings")
+    
+    def go_to_premium(e):
+        page.go("/premium")
+    
+    # Check if user has premium access
+    has_premium = billing_manager.check_premium_status()
 
     lessons = app_state.data_manager.get_lessons()
     lesson_cards = []
@@ -22,7 +38,15 @@ def HomeView(page: ft.Page, app_state: AppState):
     for lesson in lessons:
         lesson_id = lesson.get("id")
         is_completed = app_state.is_lesson_completed(lesson_id)
-        is_unlocked = app_state.is_lesson_unlocked(lesson_id)
+        # Extract numeric part from lesson ID (e.g., 'L01' -> 1)
+        try:
+            lesson_number = int(lesson_id.replace('L', '').lstrip('0') or '0')
+        except (ValueError, AttributeError):
+            lesson_number = 999  # Default to locked if can't parse
+        
+        # Every 3rd lesson (3, 6, 9, etc.) requires premium, others are free
+        is_premium_lesson = (lesson_number % 3 == 0)
+        is_unlocked = (not is_premium_lesson) or has_premium or app_state.is_lesson_unlocked(lesson_id)
         
         # Create status indicator (completed, unlocked, or locked)
         if is_completed:
@@ -46,9 +70,9 @@ def HomeView(page: ft.Page, app_state: AppState):
         
         # Update button text and properties based on lesson status
         if not is_unlocked:
-            button_text = config.get_text("locked", "Bloqueado")
-            button_color = ft.Colors.GREY_400
-            button_disabled = True
+            button_text = "Unlock Premium"
+            button_color = ft.Colors.AMBER
+            button_disabled = False
         elif is_completed:
             button_text = config.get_text("review_lesson", "Repasar")
             button_color = ft.Colors.BLUE_GREY
@@ -75,10 +99,10 @@ def HomeView(page: ft.Page, app_state: AppState):
                     ft.Container(
                         content=ft.ElevatedButton(
                             text=button_text,
-                            on_click=start_lesson if is_unlocked else None,
+                            on_click=start_lesson if is_unlocked else go_to_premium,
                             data=lesson_id,
                             color=button_color,
-                            disabled=button_disabled,
+                            disabled=False,
                             style=ft.ButtonStyle(
                                 shape=ft.RoundedRectangleBorder(radius=12),
                                 padding=ft.padding.symmetric(horizontal=24, vertical=12)
@@ -96,6 +120,8 @@ def HomeView(page: ft.Page, app_state: AppState):
             margin=ft.margin.symmetric(vertical=8)
         )
         lesson_cards.append(lesson_card)
+
+
 
     return ft.View(
         "/",

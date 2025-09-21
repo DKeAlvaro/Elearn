@@ -40,6 +40,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='assets/logo.svg',
+    icon='assets/icon.png',
     version='C:\\Users\\Alvaro\\AppData\\Local\\Temp\\89ae7b8a-1c06-4c0b-82bd-38df39a7f700',
 )

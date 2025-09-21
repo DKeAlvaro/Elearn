@@ -34,7 +34,7 @@
           "user_goal": "Greet the person appropriately and introduce yourself.",
           "llm_persona": "Act as a friendly Dutch person. Use simple Dutch. Start with a greeting. Ask for their name if they don't offer it. Keep responses under 15 words.",
           "initial_prompt": "Hallo!",
-          "required_concepts": ["L01_V01", "L01_E01", "L01_E02"],
+          "required_concepts": ["L01_V01", "L01_V02","L01_V03", "L01_V04","L01_V05", "L01_V06", "L01_V07", "L01_E01", "L01_E02", "L01_E03", "L01_G01"],
           "success_condition": "The user has greeted back and introduced themselves using 'Ik ben...'"
         }
       ]
