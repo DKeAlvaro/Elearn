@@ -77,6 +77,57 @@ class LLMClient:
             print(config.get_text("deepseek_api_error", "Error en la llamada a la API de DeepSeek: {error}").format(error=str(e)))
             return f"CONCEPTS_COVERED: []\n{config.get_text('api_error_scenario', 'Hubo un error al contactar con el servicio de IA.')}"
 
+    def extract_information(self, user_message: str, extract_info: Dict[str, str]):
+        """
+        Extract specific information from user message based on extract_info specifications.
+        Returns a dictionary with extracted values.
+        """
+        if not self.active or not config.get_effective_api_key():
+            return {}
+
+        if not extract_info:
+            return {}
+
+        # Get the target language from configuration
+        language_config = config.get_current_config()
+        target_language = language_config["target_language"]
+
+        # Build extraction instructions
+        extraction_instructions = []
+        for key, description in extract_info.items():
+            extraction_instructions.append(f"- {key}: {description}")
+        
+        instructions_text = "\n".join(extraction_instructions)
+
+        system_prompt = config.get_text(
+            "info_extraction_system_prompt",
+            "You are an information extraction assistant. The user is learning {target_language}. Extract the following information from the user's message:\n\n{instructions}\n\nRespond with ONLY a JSON object containing the extracted values. If you cannot extract a value, use null. Example: {{\"user_name\": \"John\", \"age\": null}}"
+        ).format(target_language=target_language, instructions=instructions_text)
+
+        try:
+            chat_completion = self.client.chat.completions.create(
+                model="deepseek-chat",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_message}
+                ],
+                max_tokens=100,
+                temperature=0.1
+            )
+            response = chat_completion.choices[0].message.content.strip()
+            
+            # Parse JSON response
+            try:
+                extracted_data = json.loads(response)
+                return extracted_data
+            except json.JSONDecodeError:
+                print(f"Failed to parse extraction response as JSON: {response}")
+                return {}
+                
+        except Exception as e:
+            print(config.get_text("deepseek_api_error", "Error en la llamada a la API de DeepSeek: {error}").format(error=str(e)))
+            return {}
+
     def evaluate_goal_completion(self, history: List[Dict[str, str]], current_goal: str, goal_prompt: str = ""):
         """
         Evaluates if the user has completed the current goal based on their last message.
@@ -85,10 +136,14 @@ class LLMClient:
         if not self.active or not config.get_effective_api_key():
             return f"GOAL_ACHIEVED: false\n{config.get_text('llm_not_configured_scenario', 'El cliente LLM no está configurado.')}"
 
+        # Get the target language from configuration
+        language_config = config.get_current_config()
+        target_language = language_config["target_language"]
+        
         system_prompt = config.get_text(
             "goal_evaluation_system_prompt",
             "Eres un evaluador de objetivos de aprendizaje de idiomas. Tu ÚNICA tarea es evaluar si el usuario ha completado el siguiente objetivo: '{goal}'. Responde con EXACTAMENTE una línea: GOAL_ACHIEVED: true (si completado) o GOAL_ACHIEVED: false (si no completado)."
-        ).format(goal=current_goal)
+        ).format(goal=current_goal, target_language=target_language)
         
         messages = [{"role": "system", "content": system_prompt}] + history
         

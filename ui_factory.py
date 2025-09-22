@@ -16,6 +16,11 @@ def create_slide_content(slide_data: dict):
         chat_messages = ft.ListView(expand=True, spacing=10, auto_scroll=True)
         new_message = ft.TextField(label=config.get_text("type_message", "Escribe tu mensaje..."), expand=True)
         send_button = ft.ElevatedButton(config.get_text("send_message", "Enviar"))
+        restart_button = ft.IconButton(
+            icon=ft.Icons.REFRESH,
+            tooltip=config.get_text("restart_scenario", "Reiniciar escenario"),
+            icon_size=20
+        )
         # Create a scrollable container that includes title, objectives, progress, and messages
         scrollable_content = ft.ListView(
             controls=[
@@ -44,7 +49,7 @@ def create_slide_content(slide_data: dict):
             controls=[
                 scrollable_content,
                 ft.Row(
-                    controls=[new_message, send_button],
+                    controls=[new_message, send_button, restart_button],
                     vertical_alignment=ft.CrossAxisAlignment.CENTER
                 )
             ],
@@ -57,6 +62,7 @@ def create_slide_content(slide_data: dict):
             "scrollable_content": scrollable_content, 
             "new_message": new_message, 
             "send_button": send_button,
+            "restart_button": restart_button,
             "progress_container": progress_container
         }
 

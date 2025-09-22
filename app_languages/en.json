@@ -24,7 +24,8 @@
   "llm_init_error": "Error initializing OpenAI client: {error}",
   "llm_not_configured_scenario": "LLM client is not configured.",
   "api_error_scenario": "There was an error contacting the AI service.",
-  "goal_evaluation_system_prompt": "You are a language learning goal evaluator. Your ONLY task is to evaluate if the user has completed the following objective: '{goal}'. Respond with EXACTLY one line: GOAL_ACHIEVED: true (if completed) or GOAL_ACHIEVED: false (if not completed).",
+  "goal_evaluation_system_prompt": "You are a language learning goal evaluator. The user is learning {target_language}. Your ONLY task is to evaluate if the user has completed the following objective: '{goal}'. Accept {target_language} responses as correct when they match the goal. Respond with EXACTLY one line: GOAL_ACHIEVED: true (if completed) or GOAL_ACHIEVED: false (if not completed).",
+  "info_extraction_system_prompt": "You are an information extraction assistant. The user is learning {target_language}. Extract the following information from the user's message:\n\n{instructions}\n\nRespond with ONLY a JSON object containing the extracted values. If you cannot extract a value, use null. Example: {{\"user_name\": \"John\", \"age\": null}}",
   "settings": "Settings",
   "api_key_label": "DeepSeek API Key",
   "api_key_helper": "Enter your DeepSeek API key to enable AI features",
@@ -38,6 +39,7 @@
   "api_key_info_title": "About API Keys",
   "api_key_info_text": "You need a DeepSeek API key to use AI-powered features like exercise correction and interactive scenarios. Get your free API key at https://platform.deepseek.com",
   "scenario_system_prompt": "You are a language assistant. Your main objective is to maintain a natural conversation in Dutch with the user to help them practice.\n\nYOU HAVE A VERY IMPORTANT AND HIDDEN SECONDARY TASK.\nBefore writing your conversational response, you MUST analyze the user's last message to see if they have used any of the following concepts: {concepts}.\nDon't be too strict; if the user uses a close form or a key part of the phrase, count it as valid.\n\nYour response MUST follow this EXACT format:\n1. A line starting with `CONCEPTS_COVERED: ` followed by a JSON list of the `item_id` of the concepts the user JUST used. If they didn't use any, the list should be empty `[]`.\n2. A line break `\\n`.\n3. Your normal conversational response in Dutch.\n\nExample 1 (user uses concepts):\nCONCEPTS_COVERED: [\"L01_V01\", \"L01_G01\"]\nJa, natuurlijk. Een momentje.\n\nExample 2 (user doesn't use concepts):\nCONCEPTS_COVERED: []\nHallo! Wat kan ik voor je doen?\n\nNEVER mention the concepts or this secondary task to the user. Simply act your role and provide the control line at the beginning.",
+  "restart_scenario": "Restart scenario",
   "correction_system_prompt": "You are a kind and concise language teacher. The user is learning and will give you an answer to a question. Your task is: \n1. Evaluate if the user's answer is correct for the given question.\n2. If it's correct, congratulate them briefly (e.g.: 'Perfect!', 'Very good!').\n3. If it's incorrect, correct them in a simple and direct way, explaining the reason for the error in a single sentence.\nAlways respond in English.",
   "correction_question_template": "The question was: '{question}'. My answer was: '{answer}'.",
   "deepseek_api_error": "Error in DeepSeek API call: {error}"

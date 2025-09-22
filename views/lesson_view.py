@@ -21,6 +21,7 @@ class LessonView(ft.View):
         self.chat_history = []
         self.required_concepts = []
         self.covered_concepts = set()
+        self.extracted_info = {}  # Store extracted information for template substitution
 
         self.slide_content_area = ft.Container(
             alignment=ft.alignment.center,
@@ -33,6 +34,10 @@ class LessonView(ft.View):
 
         self.controls = [
             ft.AppBar(
+                leading=ft.IconButton(
+                    icon=ft.Icons.ARROW_BACK,
+                    on_click=self.go_back_to_home
+                ),
                 title=ft.Column([
                     ft.Row([
                         ft.Image(
@@ -103,14 +108,28 @@ class LessonView(ft.View):
     def handle_interactive_scenario(self, slide_elements, slide_data):
         self.chat_history = []
         
+        # Get scenario ID for progress tracking
+        scenario_id = slide_data.get("scenario_id", "")
+        lesson_id = self.app_state.current_lesson_id
+        
         # Initialize goal-based tracking
         self.user_goals = slide_data.get("user_goal", [])
-        self.current_goal_index = 0
-        self.completed_goals = set()
+        
+        # Load saved progress if available
+        saved_progress = self.app_state.get_interactive_scenario_progress(lesson_id, scenario_id)
+        if saved_progress:
+            self.completed_goals = saved_progress['completed_goals']
+            self.current_goal_index = saved_progress['current_goal_index']
+            self.extracted_info = saved_progress['extracted_info']
+        else:
+            self.current_goal_index = 0
+            self.completed_goals = set()
+            self.extracted_info = {}  # Reset extracted information for new scenario
         
         scrollable_content = slide_elements["scrollable_content"]
         new_message = slide_elements["new_message"]
         send_button = slide_elements["send_button"]
+        restart_button = slide_elements["restart_button"]
         progress_container = slide_elements["progress_container"]
 
         def update_progress_ui():
@@ -208,13 +227,22 @@ class LessonView(ft.View):
             # This needs to be called to update the UI elements
             self.page.update()
 
-        # Show first goal prompt only (no title/setting introduction)
+        # Show appropriate goal prompt based on current progress
         if self.user_goals and len(self.user_goals) > 0:
-            first_goal = self.user_goals[0]
-            goal_prompt = first_goal.get("prompt", "")
-            if goal_prompt:
-                scrollable_content.controls.append(ChatMessage(ft.Text(goal_prompt, selectable=True), is_user=False))
-                self.chat_history.append({"role": "assistant", "content": goal_prompt})
+            # If we have saved progress, show the current goal prompt
+            if self.current_goal_index < len(self.user_goals):
+                current_goal = self.user_goals[self.current_goal_index]
+                goal_prompt = current_goal.get("prompt", "")
+                if goal_prompt:
+                    # Apply template substitution if we have extracted info
+                    try:
+                        formatted_prompt = goal_prompt.format(**self.extracted_info)
+                    except KeyError:
+                        # If template variables are missing, use original prompt
+                        formatted_prompt = goal_prompt
+                    
+                    scrollable_content.controls.append(ChatMessage(ft.Text(formatted_prompt, selectable=True), is_user=False))
+                    self.chat_history.append({"role": "assistant", "content": formatted_prompt})
         
         update_progress_ui()
 
@@ -240,6 +268,25 @@ class LessonView(ft.View):
             async def get_llm_response():
                 current_goal = self.user_goals[self.current_goal_index]["title"] if self.current_goal_index < len(self.user_goals) else ""
                 goal_prompt = self.user_goals[self.current_goal_index].get("prompt", "") if self.current_goal_index < len(self.user_goals) else ""
+                
+                # Check if current goal has extract_info field
+                current_goal_data = self.user_goals[self.current_goal_index] if self.current_goal_index < len(self.user_goals) else {}
+                extract_info = current_goal_data.get("extract_info", {})
+                
+                # Extract information if needed
+                if extract_info:
+                    import concurrent.futures
+                    with concurrent.futures.ThreadPoolExecutor() as executor:
+                        loop = asyncio.get_event_loop()
+                        extracted_data = await loop.run_in_executor(
+                            executor,
+                            self.llm_client.extract_information,
+                            user_input,
+                            extract_info
+                        )
+                        # Update extracted_info with new data
+                        if extracted_data:
+                            self.extracted_info.update(extracted_data)
                 
                 # Wrap the synchronous LLM call in an executor to make it non-blocking
                 import concurrent.futures
@@ -269,6 +316,17 @@ class LessonView(ft.View):
                         self.completed_goals.add(self.current_goal_index)
                         self.current_goal_index += 1
                         
+                        # Save progress after goal completion
+                        scenario_id = slide_data.get("scenario_id", "")
+                        lesson_id = self.app_state.current_lesson_id
+                        self.app_state.save_interactive_scenario_progress(
+                            lesson_id, 
+                            scenario_id, 
+                            self.completed_goals, 
+                            self.current_goal_index, 
+                            self.extracted_info
+                        )
+                        
                         # Update progress UI to show completed task
                         update_progress_ui()
                         
@@ -277,7 +335,12 @@ class LessonView(ft.View):
                             next_goal = self.user_goals[self.current_goal_index]
                             next_goal_prompt = next_goal.get("prompt", "")
                             if next_goal_prompt:
-                                chat_response = next_goal_prompt
+                                # Apply template substitution if we have extracted info
+                                try:
+                                    chat_response = next_goal_prompt.format(**self.extracted_info)
+                                except KeyError:
+                                    # If template variables are missing, use original prompt
+                                    chat_response = next_goal_prompt
                             else:
                                 # Use a generic continuation message
                                 chat_response = "Goed gedaan! Laten we doorgaan."
@@ -323,6 +386,50 @@ class LessonView(ft.View):
         send_button.on_click = send_message_click
         new_message.on_submit = send_message_click
 
+        def restart_scenario_click(e):
+            """Restart the interactive scenario from the beginning."""
+            # Clear progress
+            self.current_goal_index = 0
+            self.completed_goals = set()
+            self.extracted_info = {}
+            self.chat_history = []
+            
+            # Clear saved progress
+            scenario_id = slide_data.get("scenario_id", "")
+            lesson_id = self.app_state.current_lesson_id
+            self.app_state.clear_interactive_scenario_progress(lesson_id, scenario_id)
+            
+            # Clear chat messages (keep title, setting, and progress container)
+            # Find the divider and remove everything after it
+            divider_index = -1
+            for i, control in enumerate(scrollable_content.controls):
+                if isinstance(control, ft.Divider):
+                    divider_index = i
+                    break
+            
+            if divider_index >= 0:
+                # Keep everything up to and including the divider
+                scrollable_content.controls = scrollable_content.controls[:divider_index + 1]
+            
+            # Clear input field and re-enable send button
+            new_message.value = ""
+            send_button.disabled = False
+            
+            # Update progress UI and show initial goal prompt
+            update_progress_ui()
+            
+            # Show the first goal prompt if available
+            if self.user_goals and len(self.user_goals) > 0:
+                current_goal = self.user_goals[0]
+                goal_prompt = current_goal.get("prompt", "")
+                if goal_prompt:
+                    scrollable_content.controls.append(ChatMessage(ft.Text(goal_prompt, selectable=True), is_user=False))
+                    self.chat_history.append({"role": "assistant", "content": goal_prompt})
+            
+            self.page.update()
+
+        restart_button.on_click = restart_scenario_click
+
     def handle_llm_check(self, slide_elements, slide_data):
         answer_field = slide_elements["answer_field"]
         check_button = slide_elements["check_button"]
@@ -352,7 +459,40 @@ class LessonView(ft.View):
 
         check_button.on_click = check_answer_click
 
+    def save_current_scenario_progress(self):
+        """Save progress for the current interactive scenario if applicable."""
+        if hasattr(self, 'user_goals') and hasattr(self, 'completed_goals') and hasattr(self, 'current_goal_index'):
+            current_slide = self.app_state.get_current_slide_data()
+            if current_slide and current_slide.get("type") == "interactive_scenario":
+                scenario_id = current_slide.get("scenario_id", "")
+                lesson_id = self.app_state.current_lesson_id
+                if hasattr(self, 'extracted_info'):
+                    self.app_state.save_interactive_scenario_progress(
+                        lesson_id, 
+                        scenario_id, 
+                        self.completed_goals, 
+                        self.current_goal_index, 
+                        self.extracted_info
+                    )
+
+    def save_current_slide_position(self):
+        """Save the current slide position for the lesson."""
+        if self.app_state.current_lesson_id:
+            self.app_state.lesson_slide_positions[self.app_state.current_lesson_id] = self.app_state.current_slide_index
+            self.app_state.save_progress()
+
+    def go_back_to_home(self, e):
+        """Go back to home view, saving current progress."""
+        # Save current scenario progress
+        self.save_current_scenario_progress()
+        # Save current slide position
+        self.save_current_slide_position()
+        # Navigate to home
+        self.page.go('/')
+
     def go_previous(self, e):
+        # Save current scenario progress before navigating
+        self.save_current_scenario_progress()
         if self.app_state.previous_slide():
             self.update_slide_content()
 
@@ -360,7 +500,9 @@ class LessonView(ft.View):
         # Don't proceed if button is disabled
         if self.next_button.disabled:
             return
-            
+        
+        # Save current scenario progress before navigating
+        self.save_current_scenario_progress()
         if self.app_state.next_slide():
             self.update_slide_content()
         else:
