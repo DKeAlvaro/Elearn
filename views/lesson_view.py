@@ -99,26 +99,97 @@ class LessonView(ft.View):
         
         self.page.update()
 
-    # +++ FULLY REVISED METHOD with async, loading, and typing effect +++
+    # +++ GOAL-BASED INTERACTIVE SCENARIO HANDLER +++
     def handle_interactive_scenario(self, slide_elements, slide_data):
         self.chat_history = []
-        self.required_concepts = slide_data.get("required_concepts", [])
-        self.covered_concepts = set()
+        
+        # Initialize goal-based tracking
+        self.user_goals = slide_data.get("user_goal", [])
+        self.current_goal_index = 0
+        self.completed_goals = set()
         
         scrollable_content = slide_elements["scrollable_content"]
         new_message = slide_elements["new_message"]
         send_button = slide_elements["send_button"]
-        progress_text = slide_elements["progress_text"]
+        progress_container = slide_elements["progress_container"]
 
         def update_progress_ui():
-            total = len(self.required_concepts)
-            covered = len(self.covered_concepts)
-            progress_text.value = config.get_text("progress_text", "Progreso: {covered} / {total} conceptos cubiertos").format(covered=covered, total=total)
+            total_goals = len(self.user_goals)
+            completed_count = len(self.completed_goals)
             
-            is_completed = covered == total and total > 0
-            if is_completed:
-                progress_text.value = config.get_text("objective_completed", "¡Objetivo completado!")
-                # Enable the Finalizar button when interactive scenario is completed
+            # Clear existing progress controls and rebuild with styled components
+            progress_container.controls.clear()
+            
+            # Add objectives header
+            progress_container.controls.append(
+                ft.Text(
+                    "Objectives:",
+                    size=16,
+                    weight=ft.FontWeight.BOLD,
+                    color=ft.Colors.BLUE_GREY_700
+                )
+            )
+            
+            # Build styled progress items showing completed and current goals
+            for i in range(len(self.user_goals)):
+                goal_title = self.user_goals[i]["title"]
+                
+                if i in self.completed_goals:
+                    # Completed goal with checkmark and green styling
+                    goal_row = ft.Row([
+                        ft.Icon(ft.Icons.CHECK_CIRCLE, color=ft.Colors.GREEN, size=20),
+                        ft.Text(
+                            f"✓ {goal_title}",
+                            size=14,
+                            color=ft.Colors.GREEN_700,
+                            weight=ft.FontWeight.W_500
+                        )
+                    ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+                elif i == self.current_goal_index:
+                    # Current goal with arrow and blue styling
+                    goal_row = ft.Row([
+                        ft.Icon(ft.Icons.ARROW_FORWARD, color=ft.Colors.BLUE, size=20),
+                        ft.Text(
+                            goal_title,
+                            size=14,
+                            color=ft.Colors.BLUE_700,
+                            weight=ft.FontWeight.BOLD
+                        )
+                    ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+                else:
+                    # Pending goal with circle outline and muted styling
+                    goal_row = ft.Row([
+                        ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, color=ft.Colors.GREY_400, size=20),
+                        ft.Text(
+                            goal_title,
+                            size=14,
+                            color=ft.Colors.GREY_600
+                        )
+                    ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+                
+                progress_container.controls.append(goal_row)
+            
+            if completed_count >= total_goals and total_goals > 0:
+                # Add completion message with celebration styling
+                progress_container.controls.append(ft.Divider(height=10))
+                progress_container.controls.append(
+                    ft.Container(
+                        content=ft.Row([
+                            ft.Icon(ft.Icons.CELEBRATION, color=ft.Colors.AMBER, size=24),
+                            ft.Text(
+                                config.get_text("all_goals_completed", "¡Felicidades! Has completado todos los objetivos!"),
+                                size=16,
+                                weight=ft.FontWeight.BOLD,
+                                color=ft.Colors.GREEN_700
+                            )
+                        ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                        bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.GREEN),
+                        border_radius=8,
+                        padding=10
+                    )
+                )
+                
+                # Enable the Finalizar button when all goals are completed
                 lesson_content = self.app_state.data_manager.get_lesson_content(self.app_state.current_lesson_id)
                 is_last_slide = self.app_state.current_slide_index == len(lesson_content) - 1
                 if is_last_slide:
@@ -137,16 +208,16 @@ class LessonView(ft.View):
             # This needs to be called to update the UI elements
             self.page.update()
 
-        concepts_to_check = {
-            item_id: self.app_state.data_manager.get_content_by_item_id(item_id)
-            for item_id in self.required_concepts
-        }
-
-        initial_prompt = slide_data.get("initial_prompt", "Hola.")
-        scrollable_content.controls.append(ChatMessage(ft.Text(initial_prompt, selectable=True), is_user=False))
-        self.chat_history.append({"role": "assistant", "content": initial_prompt})
-        update_progress_ui()
+        # Show first goal prompt only (no title/setting introduction)
+        if self.user_goals and len(self.user_goals) > 0:
+            first_goal = self.user_goals[0]
+            goal_prompt = first_goal.get("prompt", "")
+            if goal_prompt:
+                scrollable_content.controls.append(ChatMessage(ft.Text(goal_prompt, selectable=True), is_user=False))
+                self.chat_history.append({"role": "assistant", "content": goal_prompt})
         
+        update_progress_ui()
+
         async def send_message_click(e):
             user_input = new_message.value
             if not user_input or send_button.disabled:
@@ -160,42 +231,67 @@ class LessonView(ft.View):
             # 2. Add loading indicator and update UI immediately
             loading = LoadingMessage()
             scrollable_content.controls.append(loading)
-            self.page.update()  # This should show user message and loading immediately
+            self.page.update()
 
             # 3. Add to chat history
             self.chat_history.append({"role": "user", "content": user_input})
 
             # 4. Run LLM call in a separate task to avoid blocking
             async def get_llm_response():
-                persona = slide_data.get("llm_persona", "un asistente")
+                current_goal = self.user_goals[self.current_goal_index]["title"] if self.current_goal_index < len(self.user_goals) else ""
+                goal_prompt = self.user_goals[self.current_goal_index].get("prompt", "") if self.current_goal_index < len(self.user_goals) else ""
+                
                 # Wrap the synchronous LLM call in an executor to make it non-blocking
                 import concurrent.futures
                 with concurrent.futures.ThreadPoolExecutor() as executor:
                     loop = asyncio.get_event_loop()
                     full_response = await loop.run_in_executor(
                         executor, 
-                        self.llm_client.get_scenario_response, 
-                        persona, 
+                        self.llm_client.evaluate_goal_completion, 
                         self.chat_history, 
-                        concepts_to_check
+                        current_goal,
+                        goal_prompt
                     )
                 return full_response
-            
+
             # 5. Get the response asynchronously
             try:
                 full_response = await get_llm_response()
                 
                 chat_response = "Hubo un error al procesar la respuesta."
+                goal_achieved = False
+                
                 try:
-                    control_line, parsed_response = full_response.split('\n', 1)
-                    match = re.search(r'\[.*\]', control_line)
-                    if match:
-                        newly_covered_ids = json.loads(match.group(0))
-                        for item_id in newly_covered_ids:
-                            self.covered_concepts.add(item_id)
-                    chat_response = parsed_response.strip()
-                except (ValueError, json.JSONDecodeError) as err:
-                    print(f"Error parsing LLM response: {err}")
+                    # LLM now only returns goal evaluation, no conversational response
+                    if "GOAL_ACHIEVED: true" in full_response:
+                        goal_achieved = True
+                        # Mark current goal as completed
+                        self.completed_goals.add(self.current_goal_index)
+                        self.current_goal_index += 1
+                        
+                        # Update progress UI to show completed task
+                        update_progress_ui()
+                        
+                        # If there are more goals, show only the next goal prompt
+                        if self.current_goal_index < len(self.user_goals):
+                            next_goal = self.user_goals[self.current_goal_index]
+                            next_goal_prompt = next_goal.get("prompt", "")
+                            if next_goal_prompt:
+                                chat_response = next_goal_prompt
+                            else:
+                                # Use a generic continuation message
+                                chat_response = "Goed gedaan! Laten we doorgaan."
+                        else:
+                            # All goals completed
+                            chat_response = "Perfect! Je hebt alle doelen bereikt."
+                    else:
+                        # Goal not achieved, encourage to try again
+                        retry_msg = config.get_text("goal_not_achieved", "No es del todo correcto. ¡Inténtalo de nuevo!")
+                        chat_response = retry_msg
+                        
+                except Exception as err:
+                    print(f"Error processing LLM response: {err}")
+                    chat_response = "Hubo un error al procesar la respuesta."
 
                 # 6. Remove loading and prepare for typing effect
                 scrollable_content.controls.remove(loading)
@@ -208,16 +304,17 @@ class LessonView(ft.View):
 
                 self.chat_history.append({"role": "assistant", "content": chat_response})
                 
-                # 8. Update progress and re-enable inputs if not completed
+                # 8. Update progress and re-enable inputs if not all goals completed
                 update_progress_ui()
-                if len(self.covered_concepts) < len(self.required_concepts):
+                if len(self.completed_goals) < len(self.user_goals):
                      send_button.disabled = False
 
                 self.page.update()
                 
             except Exception as e:
                 # Handle any errors
-                scrollable_content.controls.remove(loading)
+                if loading in scrollable_content.controls:
+                    scrollable_content.controls.remove(loading)
                 error_text = ft.Text(f"Error: {str(e)}", selectable=True)
                 scrollable_content.controls.append(ChatMessage(error_text, is_user=False))
                 send_button.disabled = False

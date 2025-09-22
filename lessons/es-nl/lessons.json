@@ -22,7 +22,6 @@
           "title": "¡Pide en el restaurante!",
           "setting": "Estás en un restaurante en Ámsterdam. El LLM actuará como el camarero.",
           "user_goal": "Pide educadamente pan y agua usando las frases que has aprendido.",
-          "llm_persona": "Actúa como un camarero neerlandés amable. Responde en neerlandés de forma sencilla y natural. Tu objetivo es ayudar al usuario a practicar. Si el usuario tiene dificultades, guíale sutilmente para que use la expresión 'Mag ik...'. Mantén tus respuestas cortas.",
           "initial_prompt": "Goedenavond! Wat kan ik voor u doen?",
           "required_concepts": ["L01_V01", "L01_V02", "L01_G01"],
           "success_condition": "El usuario ha pedido correctamente agua y pan usando la estructura 'Mag ik...'."

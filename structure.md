@@ -62,7 +62,7 @@ The application follows a simple design pattern where the **UI is a reflection o
 
 ### **views/**
 - **home_view.py**: Defines the home screen with a list of lessons. Features logo in the app bar header.  
-- **lesson_view.py**: Defines the lesson screen. Manages its own internal state to update slides without reloading the entire view. Includes logo in the app bar.
+- **lesson_view.py**: Defines the lesson screen. Manages its own internal state to update slides without reloading the entire view. Includes logo in the app bar. For interactive scenarios, automatically collects all item_ids from the lesson as required concepts but only requires 3 to be mentioned for completion.
 - **settings_view.py**: Defines the settings screen for API key configuration. Features logo in the app bar header.  
 
 ---

@@ -11,8 +11,8 @@ def create_slide_content(slide_data: dict):
     
     # --- NUEVO: Manejador para el escenario interactivo ---
     if slide_type == 'interactive_scenario':
-        # +++ ADDED progress_text control +++
-        progress_text = ft.Text(size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700)
+        # +++ ADDED progress_container for styled objectives +++
+        progress_container = ft.Column(spacing=8)
         chat_messages = ft.ListView(expand=True, spacing=10, auto_scroll=True)
         new_message = ft.TextField(label=config.get_text("type_message", "Escribe tu mensaje..."), expand=True)
         send_button = ft.ElevatedButton(config.get_text("send_message", "Enviar"))
@@ -24,12 +24,14 @@ def create_slide_content(slide_data: dict):
                     padding=ft.padding.only(bottom=10)
                 ),
                 ft.Container(
-                    content=ft.Text(f"{config.get_text("objective_text")} {slide_data.get('user_goal')}", size=16),
+                    content=ft.Text(f"{slide_data.get('setting')}", size=16),
                     padding=ft.padding.only(bottom=10)
                 ),
                 ft.Container(
-                    content=progress_text,
-                    padding=ft.padding.only(bottom=10)
+                    content=progress_container,
+                    padding=ft.padding.all(12),
+                    bgcolor=ft.Colors.with_opacity(0.05, ft.Colors.BLUE_GREY),
+                    border_radius=8
                 ),
                 ft.Divider(),
             ],
@@ -55,7 +57,7 @@ def create_slide_content(slide_data: dict):
             "scrollable_content": scrollable_content, 
             "new_message": new_message, 
             "send_button": send_button,
-            "progress_text": progress_text
+            "progress_container": progress_container
         }
 
     if slide_type == 'llm_check':

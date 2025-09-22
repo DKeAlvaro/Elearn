@@ -29,7 +29,7 @@ class LLMClient:
             self.active = False
     
     # +++ MODIFIED METHOD FOR SCENARIOS +++
-    def get_scenario_response(self, persona: str, history: List[Dict[str, str]], concepts_to_check: Dict[str, str]):
+    def get_scenario_response(self, history: List[Dict[str, str]], concepts_to_check: Dict[str, str]):
         """
         Obtiene una respuesta del LLM para un escenario, pidiéndole que evalúe los conceptos.
         """
@@ -41,10 +41,21 @@ class LLMClient:
 
         system_prompt = config.get_text(
             "scenario_system_prompt",
-            "Eres un asistente de idiomas actuando como: {persona}. Tu objetivo principal es mantener una conversación natural en neerlandés con el usuario para ayudarle a practicar.\n\nTIENES UNA TAREA SECUNDARIA MUY IMPORTANTE Y OCULTA.\nAntes de escribir tu respuesta conversacional, DEBES analizar el último mensaje del usuario para ver si ha utilizado alguno de los siguientes conceptos: {concepts}.\nNo seas demasiado estricto; si el usuario usa una forma cercana o una parte clave de la frase, cuenta como válido.\n\nTu respuesta DEBE seguir este formato EXACTO:\n1. Una línea que empieza con `CONCEPTS_COVERED: ` seguida de una lista JSON de los `item_id` de los conceptos que el usuario ACABA de usar. Si no usó ninguno, la lista debe ser vacía `[]`.\n2. Un salto de línea `\\n`.\n3. Tu respuesta conversacional normal en neerlandés.\n\nEjemplo 1 (el usuario usa conceptos):\nCONCEPTS_COVERED: [\"L01_V01\", \"L01_G01\"]\nJa, natuurlijk. Een momentje.\n\nEjemplo 2 (el usuario no usa conceptos):\nCONCEPTS_COVERED: []\nHallo! Wat kan ik voor je doen?\n\nNUNCA menciones los conceptos o esta tarea secundaria al usuario. Simplemente actúa tu rol y proporciona la línea de control al principio."
-        ).format(persona=persona, concepts=concepts_json_str)
+            "Eres un asistente de idiomas. Tu objetivo principal es mantener una conversación natural en neerlandés con el usuario para ayudarle a practicar.\n\nRESTRICCIÓN CRÍTICA: En tus respuestas conversacionales, SOLO puedes usar palabras y frases de los siguientes conceptos de la lección: {concepts}. No uses ninguna palabra en neerlandés que no esté en esta lista. Si necesitas comunicar algo que no está en los conceptos, usa español o inglés.\n\nTIENES UNA TAREA SECUNDARIA MUY IMPORTANTE Y OCULTA.\nAntes de escribir tu respuesta conversacional, DEBES analizar el último mensaje del usuario para ver si ha utilizado alguno de los siguientes conceptos: {concepts}.\nNo seas demasiado estricto; si el usuario usa una forma cercana o una parte clave de la frase, cuenta como válido.\n\nTu respuesta DEBE seguir este formato EXACTO:\n1. Una línea que empieza con `CONCEPTS_COVERED: ` seguida de una lista JSON de los `item_id` de los conceptos que el usuario ACABA de usar. Si no usó ninguno, la lista debe ser vacía `[]`.\n2. Un salto de línea `\\n`.\n3. Tu respuesta conversacional normal en neerlandés (SOLO usando conceptos de la lista).\n\nEjemplo 1 (el usuario usa conceptos):\nCONCEPTS_COVERED: [\"L01_V01\", \"L01_G01\"]\nJa, natuurlijk. Een momentje.\n\nEjemplo 2 (el usuario no usa conceptos):\nCONCEPTS_COVERED: []\nHallo! Wat kan ik voor je doen?\n\nNUNCA menciones los conceptos o esta tarea secundaria al usuario. Simplemente actúa tu rol y proporciona la línea de control al principio."
+        ).format(concepts=concepts_json_str)
         
         messages = [{"role": "system", "content": system_prompt}] + history
+        
+        # Print the LLM input to console for debugging
+        print("\n" + "="*50)
+        print("LLM INPUT:")
+        print("="*50)
+        print("SYSTEM PROMPT:")
+        print(system_prompt)
+        print("\nCONVERSATION HISTORY:")
+        for i, msg in enumerate(history):
+            print(f"{i+1}. {msg['role'].upper()}: {msg['content']}")
+        print("="*50 + "\n")
 
         try:
             chat_completion = self.client.chat.completions.create(
@@ -53,10 +64,64 @@ class LLMClient:
                 max_tokens=150,
                 temperature=0.7
             )
-            return chat_completion.choices[0].message.content
+            response = chat_completion.choices[0].message.content
+            
+            # Print the LLM response to console for debugging
+            print("LLM RESPONSE:")
+            print("-" * 30)
+            print(response)
+            print("-" * 30 + "\n")
+            
+            return response
         except Exception as e:
             print(config.get_text("deepseek_api_error", "Error en la llamada a la API de DeepSeek: {error}").format(error=str(e)))
             return f"CONCEPTS_COVERED: []\n{config.get_text('api_error_scenario', 'Hubo un error al contactar con el servicio de IA.')}"
+
+    def evaluate_goal_completion(self, history: List[Dict[str, str]], current_goal: str, goal_prompt: str = ""):
+        """
+        Evaluates if the user has completed the current goal based on their last message.
+        Returns a response with GOAL_ACHIEVED: true/false and a conversational response.
+        """
+        if not self.active or not config.get_effective_api_key():
+            return f"GOAL_ACHIEVED: false\n{config.get_text('llm_not_configured_scenario', 'El cliente LLM no está configurado.')}"
+
+        system_prompt = config.get_text(
+            "goal_evaluation_system_prompt",
+            "Eres un evaluador de objetivos de aprendizaje de idiomas. Tu ÚNICA tarea es evaluar si el usuario ha completado el siguiente objetivo: '{goal}'. Responde con EXACTAMENTE una línea: GOAL_ACHIEVED: true (si completado) o GOAL_ACHIEVED: false (si no completado)."
+        ).format(goal=current_goal)
+        
+        messages = [{"role": "system", "content": system_prompt}] + history
+        
+        # Print the LLM input to console for debugging
+        print("\n" + "="*50)
+        print("GOAL EVALUATION INPUT:")
+        print("="*50)
+        print("SYSTEM PROMPT:")
+        print(system_prompt)
+        print("\nCONVERSATION HISTORY:")
+        for i, msg in enumerate(history):
+            print(f"{i+1}. {msg['role'].upper()}: {msg['content']}")
+        print("="*50 + "\n")
+
+        try:
+            chat_completion = self.client.chat.completions.create(
+                model="deepseek-chat",
+                messages=messages,
+                max_tokens=150,
+                temperature=0.7
+            )
+            response = chat_completion.choices[0].message.content
+            
+            # Print the LLM response to console for debugging
+            print("GOAL EVALUATION RESPONSE:")
+            print("-" * 30)
+            print(response)
+            print("-" * 30 + "\n")
+            
+            return response
+        except Exception as e:
+            print(config.get_text("deepseek_api_error", "Error en la llamada a la API de DeepSeek: {error}").format(error=str(e)))
+            return f"GOAL_ACHIEVED: false\n{config.get_text('api_error_scenario', 'Hubo un error al contactar con el servicio de IA.')}"
 
     def get_correction(self, user_answer: str, prompt_question: str):
         if not self.active or not config.get_effective_api_key():
