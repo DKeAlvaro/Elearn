@@ -29,7 +29,13 @@ class LessonView(ft.View):
             expand=True
         )
 
-        self.previous_button = ft.ElevatedButton(config.get_text("previous"), on_click=self.go_previous, visible=False)
+        self.previous_button = ft.ElevatedButton(
+            config.get_text("previous"), 
+            on_click=self.go_previous, 
+            visible=True,
+            disabled=True,
+            opacity=0.0  # Start invisible but still take up space
+        )
         self.next_button = ft.ElevatedButton(on_click=self.go_next)
 
         self.controls = [
@@ -61,11 +67,15 @@ class LessonView(ft.View):
                 center_title=True
             ),
             self.slide_content_area,
-            ft.Row(
-                [self.previous_button, self.next_button],
-                alignment=ft.MainAxisAlignment.SPACE_AROUND,
-                spacing=20,
-                vertical_alignment=ft.CrossAxisAlignment.CENTER
+            ft.Container(
+                content=ft.Row(
+                    [self.previous_button, self.next_button],
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+                    spacing=20,
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER
+                ),
+                padding=ft.padding.only(bottom=20, left=16, right=16, top=10),
+                height=80  # Ensure consistent height for button area
             )
         ]
         
@@ -79,7 +89,13 @@ class LessonView(ft.View):
         lesson_content = self.app_state.data_manager.get_lesson_content(self.app_state.current_lesson_id)
         is_last_slide = self.app_state.current_slide_index == len(lesson_content) - 1
         self.next_button.text = config.get_text("finish", "Finalizar") if is_last_slide else config.get_text("next", "Siguiente")
-        self.previous_button.visible = self.app_state.current_slide_index > 0
+        # Use opacity and disabled state instead of visibility to maintain layout
+        if self.app_state.current_slide_index > 0:
+            self.previous_button.opacity = 1.0
+            self.previous_button.disabled = False
+        else:
+            self.previous_button.opacity = 0.0
+            self.previous_button.disabled = True
         
         # Disable 'Finalizar' button by default on last slide
         if is_last_slide:

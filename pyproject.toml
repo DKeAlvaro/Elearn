@@ -5,7 +5,8 @@ description = "Educational Learning App"
 dependencies = [
     "flet>=0.27.1",
     "requests",
-    "python-dotenv"
+    "python-dotenv",
+    "openai"
 ]
 
 [tool.flet.android]

@@ -1,12 +1,19 @@
 # llm_client.py
 import config
-from openai import OpenAI
 from typing import List, Dict
 import json
+
+# Safely import OpenAI to avoid crashing on Android if the package isn't available
+try:
+    from openai import OpenAI
+except Exception:
+    OpenAI = None
 
 class LLMClient:
     def __init__(self):
         try:
+            if OpenAI is None:
+                raise ImportError("openai package not available")
             self.client = OpenAI(
                 api_key=config.get_effective_api_key(),
                 base_url=config.DEEPSEEK_BASE_URL
@@ -19,6 +26,8 @@ class LLMClient:
     def update_api_key(self):
         """Update the API key for the client"""
         try:
+            if OpenAI is None:
+                raise ImportError("openai package not available")
             self.client = OpenAI(
                 api_key=config.get_effective_api_key(),
                 base_url=config.DEEPSEEK_BASE_URL

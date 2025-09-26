@@ -20,15 +20,19 @@ class BillingManager:
         self.premium_product_id = "premium_unlock_5euro"
         self.purchase_callback: Optional[Callable] = None
         self.connection_callback: Optional[Callable] = None
+        # Defer Android initialization to avoid startup crashes
+        self.activity = None
+        self.android_initialized = False
         
-        # Initialize Android classes if available
-        if ANDROID_AVAILABLE:
-            self._init_android_classes()
+        # Do NOT call _init_android_classes() here to avoid early crashes on app start
+        # It will be called lazily when the premium view initializes billing.
     
     def _init_android_classes(self):
         """Initialize Android classes using Pyjnius"""
+        # Ensure we update the module-level flag when classes are unavailable
+        global ANDROID_AVAILABLE
         try:
-            # Get the main activity
+            # Get the main activity if environment variable is provided
             activity_host_class = os.getenv("MAIN_ACTIVITY_HOST_CLASS_NAME")
             if activity_host_class:
                 activity_host = autoclass(activity_host_class)
@@ -43,15 +47,26 @@ class BillingManager:
             self.QueryProductDetailsParams = autoclass('com.android.billingclient.billing.QueryProductDetailsParams')
             self.BillingFlowParams = autoclass('com.android.billingclient.billing.BillingFlowParams')
             
+            self.android_initialized = True
             print("Android billing classes initialized successfully")
         except Exception as e:
             print(f"Error initializing Android classes: {e}")
             ANDROID_AVAILABLE = False
+            self.android_initialized = False
     
     def initialize_billing_client(self, purchase_callback: Callable = None, connection_callback: Callable = None):
         """Initialize the Google Play Billing client"""
         if not ANDROID_AVAILABLE:
             print("Billing not available - not running on Android")
+            return False
+        
+        # Lazily initialize Android classes
+        if not self.android_initialized:
+            self._init_android_classes()
+        
+        # Ensure activity and classes are available before proceeding
+        if not ANDROID_AVAILABLE or not self.android_initialized or self.activity is None:
+            print("Android billing not initialized or activity unavailable")
             return False
         
         self.purchase_callback = purchase_callback
@@ -266,6 +281,11 @@ class BillingManager:
             billing_flow_params = self.BillingFlowParams.newBuilder()
             billing_flow_params = billing_flow_params.setProductDetailsParamsList(product_params_list)
             billing_flow_params_built = billing_flow_params.build()
+            
+            # Guard activity presence
+            if self.activity is None:
+                print("Cannot launch billing flow: activity is unavailable")
+                return
             
             # Launch billing flow
             billing_result = self.billing_client.launchBillingFlow(self.activity, billing_flow_params_built)

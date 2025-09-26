@@ -27,11 +27,12 @@ def main(page: ft.Page):
     page.window_min_height = 600
     page.adaptive = True
     page.scroll = ft.ScrollMode.ADAPTIVE
-    page.padding = ft.padding.symmetric(horizontal=16, vertical=8)
+    # Add safe area padding for mobile devices to avoid navigation bar collision
+    page.padding = ft.padding.only(left=16, right=16, top=8, bottom=0)
     
     # Show loading screen initially
     loading_screen = ft.Column([
-        ft.Container(height=80),  # Add top spacing to lower the logo
+        # ft.Container(height=80), 
         ft.Image(
             src="assets/logo.svg",
             width=120,
