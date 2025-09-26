@@ -10,29 +10,10 @@ from views.lesson_view import LessonView
 from views.settings_view import SettingsView
 from views.premium_view import PremiumView
 from billing_manager import billing_manager
+from settings_manager import SettingsManager
 
-def main(page: ft.Page):
-    page.title = config.get_text("app_title", "Language Learning App")
-    
-    # Set app icon using the logo
-    page.window_icon = "assets/logo.svg"
-    
-    # Set web app icon (favicon) for browser
-    page.web_app_icon = "assets/logo.svg"
-    
-    # Mobile-optimized page settings
-    page.window_width = 400
-    page.window_height = 800
-    page.window_min_width = 350
-    page.window_min_height = 600
-    page.adaptive = True
-    page.scroll = ft.ScrollMode.ADAPTIVE
-    # Add safe area padding for mobile devices to avoid navigation bar collision
-    page.padding = ft.padding.only(left=16, right=16, top=8, bottom=0)
-    
-    # Show loading screen initially
-    loading_screen = ft.Column([
-        # ft.Container(height=80), 
+def create_loading_screen():
+    return ft.Column([
         ft.Image(
             src="assets/logo.svg",
             width=120,
@@ -44,7 +25,22 @@ def main(page: ft.Page):
     ], 
     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
     alignment=ft.MainAxisAlignment.CENTER)
+
+def main(page: ft.Page):
+    page.title = config.get_text("app_title", "Language Learning App")
     
+    page.window_icon = "assets/logo.svg"
+    page.web_app_icon = "assets/logo.svg"
+    
+    page.window_width = 400
+    page.window_height = 800
+    page.window_min_width = 350
+    page.window_min_height = 600
+    page.adaptive = True
+    page.scroll = ft.ScrollMode.ADAPTIVE
+    page.padding = ft.padding.only(left=16, right=16, top=8, bottom=0)
+    
+    loading_screen = create_loading_screen()
     page.add(loading_screen)
     page.update()
     
@@ -55,10 +51,14 @@ def main(page: ft.Page):
     }
     
     # --- Inicialización ---
-    # DataManager now automatically uses the current language configuration
     data_manager = DataManager()
     app_state = AppState(data_manager)
     llm_client = LLMClient()
+    settings_manager = SettingsManager(llm_client, page)
+    
+    # Check premium status and update app_state
+    has_premium = billing_manager.check_premium_status()
+    app_state.update_premium_status(has_premium)
     
     # Add a small delay to ensure loading screen is visible
     import time
@@ -75,7 +75,7 @@ def main(page: ft.Page):
         if page.route == "/lesson":
             page.views.append(LessonView(page, app_state, llm_client))
         elif page.route == "/settings":
-            page.views.append(SettingsView(page, llm_client))
+            page.views.append(SettingsView(page, settings_manager))
         elif page.route == "/premium":
             page.views.append(PremiumView(page))
         

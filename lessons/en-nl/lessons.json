@@ -9,311 +9,555 @@
   "lessons": [
 
 {
-  "id": "L01_NL_Park",
-  "title": "Lesson 1 — In the park: meeting people",
+  "id": "IPM01",
+  "title": "In the park: meeting people",
   "content": [
     {
       "type": "tip",
-      "text": "Welkom bij je eerste les Nederlands! Let's learn how to greet people and start a simple conversation in a Dutch park."
-    },
-    { "type": "vocabulary", "item_id": "L01_NL_V01", "data": { "Hallo": "Hello" } },
-    { "type": "vocabulary", "item_id": "L01_NL_V02", "data": { "Hoi": "Hi (informal)" } },
-    {
-      "type": "grammar",
-      "item_id": "L01_NL_G01",
-      "title": "Subject Pronouns: I & You",
-      "explanation": "Let's start with the basics. 'Ik' means 'I'. 'Jij' or the shorter 'je' means 'you' (informal)."
+      "text": "Welkom! In this lesson, you'll learn how to meet and greet people in Dutch. Let's go to the park!"
     },
     {
-      "type": "grammar",
-      "item_id": "L01_NL_G02",
-      "title": "To be: 'zijn'",
-      "explanation": "To say 'I am', you say 'Ik ben'. To say 'you are', you say 'Jij bent'."
+      "type": "expression",
+      "item_id": "IPM01_E01",
+      "data": {
+        "phrase": "Hallo.",
+        "meaning": "Hello."
+      }
     },
-    { "type": "expression", "item_id": "L01_NL_E01", "data": { "phrase": "Ik ben...", "meaning": "I am..." } },
     {
       "type": "grammar",
-      "item_id": "L01_NL_G03",
-      "title": "To be called: 'heten'",
-      "explanation": "For names, you can also use the verb 'heten'. 'Ik heet' means 'I am called'. 'Jij heet' means 'You are called'."
+      "item_id": "IPM01_G01",
+      "title": "Subject Pronoun: ik",
+      "explanation": "To talk about yourself, you use the pronoun 'ik', which means 'I'."
     },
-    { "type": "expression", "item_id": "L01_NL_E02", "data": { "phrase": "Ik heet...", "meaning": "My name is..." } },
-    { "type": "tip", "text": "'Ik ben...' and 'Ik heet...' are both used for introductions. 'Ik ben...' is a bit more common in casual conversation." },
     {
       "type": "grammar",
-      "item_id": "L01_NL_G04",
-      "title": "Word Order: Verb-Second",
-      "explanation": "In simple Dutch sentences, the verb always comes in the second position. For example: 'Ik (1) ben (2) Mark.'"
+      "item_id": "IPM01_G02",
+      "title": "The Verb 'heten'",
+      "explanation": "'Heten' means 'to be called'. When you talk about yourself, you say 'ik heet...'"
     },
-    { "type": "expression", "item_id": "L01_NL_E03", "data": { "phrase": "Aangenaam.", "meaning": "Pleased to meet you." } },
+    {
+      "type": "expression",
+      "item_id": "IPM01_E02",
+      "data": {
+        "phrase": "Ik heet...",
+        "meaning": "My name is..."
+      }
+    },
+    {
+      "type": "grammar",
+      "item_id": "IPM01_G03",
+      "title": "Subject Pronoun: jij / je",
+      "explanation": "'Jij' is the Dutch word for 'you' (informal). You can often use the shorter form 'je'."
+    },
+    {
+      "type": "grammar",
+      "item_id": "IPM01_G04",
+      "title": "The Verb 'zijn'",
+      "explanation": "'Zijn' means 'to be'. To say 'I am', you use 'Ik ben...'"
+    },
+    {
+      "type": "expression",
+      "item_id": "IPM01_E03",
+      "data": {
+        "phrase": "Ik ben...",
+        "meaning": "I am..."
+      }
+    },
     {
       "type": "pronunciation",
-      "item_id": "L01_NL_P01",
-      "data": { "word": "Aangenaam", "phonetic": "AHN-khuh-nahm", "tip": "The Dutch 'g' is a soft, throaty sound from the back of your throat, similar to the 'ch' in the Scottish word 'loch'." }
+      "item_id": "IPM01_P01",
+      "data": {
+        "word": "ben",
+        "phonetic": "ben",
+        "tip": "This sounds very similar to the English name 'Ben'."
+      }
+    },
+    {
+      "type": "grammar",
+      "item_id": "IPM01_G05",
+      "title": "WH- Questions",
+      "explanation": "Questions with words like 'Waar' (Where) or 'Wie' (Who) usually follow this structure: Question Word + Verb + Subject."
+    },
+    {
+      "type": "expression",
+      "item_id": "IPM01_E04",
+      "data": {
+        "phrase": "Hoe heet je?",
+        "meaning": "What is your name?"
+      }
+    },
+    {
+      "type": "expression",
+      "item_id": "IPM01_E05",
+      "data": {
+        "phrase": "Aangenaam.",
+        "meaning": "Nice to meet you."
+      }
+    },
+    {
+      "type": "pronunciation",
+      "item_id": "IPM01_P02",
+      "data": {
+        "word": "Aangenaam",
+        "phonetic": "AAN-khuh-naam",
+        "tip": "The 'g' sound is a soft, throaty sound, typical in Dutch."
+      }
     },
     {
       "type": "interactive_scenario",
-      "scenario_id": "L01_NL_S01",
-      "title": "First Introduction",
-      "setting": "You see someone friendly sitting on a park bench. You decide to go over and say hello.",
-      "user_goal":[
-        {"title":"Say hello",
-          "prompt":"Hoi!"},
-        {"title":"Tell them your name using 'Ik ben...'",
-          "prompt":"Aangenaam! Ik ben Anna. En jij?",
+      "scenario_id": "IPM01_S01",
+      "title": "A Friendly Hello",
+      "setting": "You are in the park and someone greets you. Let's practice introducing yourselves.",
+      "user_goal": [
+        {
+          "title": "Say hello back.",
+          "prompt": "Hallo!"
+        },
+        {
+          "title": "Tell her your name.",
+          "prompt": "Ik heet Eva. Hoe heet jij?",
           "extract_info": {
-            "user_name": "Extract the user's name from their message"
-          }},
-        {"title":"Say 'Pleased to meet you.'",
-          "prompt":"Leuk je te ontmoeten, {user_name}!"}
+            "user_name": "Extract the user's name from their message."
+          }
+        },
+        {
+          "title": "Say 'Nice to meet you.'",
+          "prompt": "Aangenaam, {user_name}!"
+        }
       ]
     },
     {
-      "type": "grammar",
-      "item_id": "L01_NL_G05",
-      "title": "Formal 'You': U",
-      "explanation": "Besides 'jij/je', there is a formal way to say 'you': 'u'. You use it with strangers, older people, or in formal settings."
+      "type": "tip",
+      "text": "Great job! Now, let's learn about politeness. Dutch has formal and informal ways of saying 'you'."
     },
     {
       "type": "grammar",
-      "item_id": "L01_NL_G06",
-      "title": "Verb Forms with 'u'",
-      "explanation": "When using the formal 'u', the verb forms are: 'u bent' (you are) and 'u heet' (you are called)."
-    },
-    { "type": "tip", "text": "When in doubt, using 'u' is always the safer, more polite option. The other person will often suggest switching to 'je'." },
-    {
-      "type": "grammar",
-      "item_id": "L01_NL_G07",
-      "title": "To come: 'komen'",
-      "explanation": "'Ik kom' means 'I come'. 'Jij komt' means 'You come'. 'U komt' also means 'You come' (formal)."
-    },
-    { "type": "vocabulary", "item_id": "L01_NL_V03", "data": { "Waar": "Where" } },
-    { "type": "vocabulary", "item_id": "L01_NL_V04", "data": { "vandaan": "from" } },
-    {
-      "type": "grammar",
-      "item_id": "L01_NL_G08",
-      "title": "Wh- Questions",
-      "explanation": "Questions starting with a question word (like 'Waar') follow this order: Question Word - Verb - Subject. For example: 'Waar kom jij...?'"
-    },
-    { "type": "expression", "item_id": "L01_NL_E04", "data": { "phrase": "Waar kom je vandaan?", "meaning": "Where do you come from?" } },
-    { "type": "expression", "item_id": "L01_NL_E05", "data": { "phrase": "Waar komt u vandaan?", "meaning": "Where do you come from? (formal)" } },
-    { "type": "vocabulary", "item_id": "L01_NL_V05", "data": { "uit": "from / out of" } },
-    { "type": "vocabulary", "item_id": "L01_NL_V06", "data": { "Nederland": "The Netherlands", "Duitsland": "Germany", "Spanje": "Spain" } },
-    {
-      "type": "grammar",
-      "item_id": "L01_NL_G09",
-      "title": "More Pronouns: He & She",
-      "explanation": "'Hij' means 'he'. 'Zij' or 'ze' means 'she'. The verb forms are the same as for 'jij': 'hij is', 'zij heet', 'hij komt'."
+      "item_id": "IPM01_G06",
+      "title": "Formal 'You': u",
+      "explanation": "Use 'u' when speaking to someone you don't know, someone older, or in a formal setting. It's a sign of respect."
     },
     {
       "type": "grammar",
-      "item_id": "L01_NL_G10",
-      "title": "Plural Pronouns",
-      "explanation": "'Wij' or 'we' means 'we'. 'Jullie' means 'you' (plural). 'Zij' or 'ze' means 'they'."
+      "item_id": "IPM01_G07",
+      "title": "Verbs with 'u'",
+      "explanation": "When using 'u', the verbs change. For example: 'u bent' (you are) and 'u heet' (you are called)."
+    },
+    {
+      "type": "expression",
+      "item_id": "IPM01_E06",
+      "data": {
+        "phrase": "Hoe heet u?",
+        "meaning": "What is your name? (formal)"
+      }
     },
     {
       "type": "grammar",
-      "item_id": "L01_NL_G11",
-      "title": "Plural Verb Forms",
-      "explanation": "For all plural pronouns ('wij', 'jullie', 'zij'), the verb form is the infinitive: 'wij zijn', 'jullie heten', 'zij komen'."
+      "item_id": "IPM01_G08",
+      "title": "The Verb 'komen'",
+      "explanation": "'Komen' means 'to come'. To say where you come from, you say 'Ik kom uit...'"
     },
-    { "type": "vocabulary", "item_id": "L01_NL_V07", "data": { "spreken": "to speak" } },
-    { "type": "expression", "item_id": "L01_NL_E06", "data": { "phrase": "Ik spreek...", "meaning": "I speak..." } },
-    { "type": "vocabulary", "item_id": "L01_NL_V08", "data": { "Engels": "English", "Nederlands": "Dutch", "Spaans": "Spanish" } },
+    {
+      "type": "vocabulary",
+      "item_id": "IPM01_V01",
+      "data": {
+        "Nederland": "The Netherlands"
+      }
+    },
     {
       "type": "grammar",
-      "item_id": "L01_NL_G12",
+      "item_id": "IPM01_G09",
+      "title": "Verb-Second Word Order",
+      "explanation": "In simple Dutch sentences, the verb is almost always the second element. For example: 'Ik (1) kom (2) uit Nederland.'"
+    },
+    {
+      "type": "vocabulary",
+      "item_id": "IPM01_V02",
+      "data": {
+        "Spanje": "Spain"
+      }
+    },
+    {
+      "type": "expression",
+      "item_id": "IPM01_E07",
+      "data": {
+        "phrase": "Waar kom je vandaan?",
+        "meaning": "Where do you come from?"
+      }
+    },
+    {
+      "type": "grammar",
+      "item_id": "IPM01_G10",
+      "title": "Subject Pronouns: hij & zij/ze",
+      "explanation": "To talk about other people, use 'hij' (he) and 'zij' or 'ze' (she)."
+    },
+    {
+      "type": "grammar",
+      "item_id": "IPM01_G11",
+      "title": "Verbs with 'hij' and 'zij'",
+      "explanation": "For 'hij' and 'zij', the verb form is usually the stem + t. Example: 'hij komt', 'zij heet', 'hij is'."
+    },
+    {
+      "type": "vocabulary",
+      "item_id": "IPM01_V03",
+      "data": {
+        "Nederlands": "Dutch (language)"
+      }
+    },
+    {
+      "type": "vocabulary",
+      "item_id": "IPM01_V04",
+      "data": {
+        "Engels": "English (language)"
+      }
+    },
+    {
+      "type": "expression",
+      "item_id": "IPM01_E08",
+      "data": {
+        "phrase": "Ik spreek Engels.",
+        "meaning": "I speak English."
+      }
+    },
+    {
+      "type": "grammar",
+      "item_id": "IPM01_G12",
       "title": "Yes/No Questions",
-      "explanation": "To form a question that can be answered with yes or no, you put the verb first: Verb - Subject... For example: 'Spreek jij Engels?'"
+      "explanation": "To ask a yes/no question, you start the sentence with the verb. The word order is: Verb + Subject + ...?"
     },
-    { "type": "vocabulary", "item_id": "L01_NL_V09", "data": { "Ja": "Yes", "Nee": "No" } },
-    { "type": "vocabulary", "item_id": "L01_NL_V10", "data": { "een beetje": "a little bit" } },
-    { "type": "tip", "text": "Time for some small talk! Talking about the weather is always a good start in the Netherlands." },
-    { "type": "vocabulary", "item_id": "L01_NL_V11", "data": { "Mooi weer": "Nice weather" } },
-    { "type": "expression", "item_id": "L01_NL_E07", "data": { "phrase": "Mooi weer, hè?", "meaning": "Nice weather, isn't it?" } },
+    {
+      "type": "expression",
+      "item_id": "IPM01_E09",
+      "data": {
+        "phrase": "Spreek je Nederlands?",
+        "meaning": "Do you speak Dutch?"
+      }
+    },
+    {
+      "type": "grammar",
+      "item_id": "IPM01_G13",
+      "title": "Plural Pronouns",
+      "explanation": "Let's learn the plural pronouns: 'wij/we' (we), 'jullie' (you all), and 'zij/ze' (they)."
+    },
+    {
+      "type": "vocabulary",
+      "item_id": "IPM01_V05",
+      "data": {
+        "wandelen": "to walk, to stroll"
+      }
+    },
+    {
+      "type": "vocabulary",
+      "item_id": "IPM01_V06",
+      "data": {
+        "lezen": "to read"
+      }
+    },
+    {
+      "type": "tip",
+      "text": "Let's put everything together! You are now ready to have a short conversation with someone new."
+    },
     {
       "type": "interactive_scenario",
-      "scenario_id": "L01_NL_S02",
-      "title": "A Full Conversation",
-      "setting": "You are walking your dog in the park and meet an older gentleman who comments on the weather. Time to practice everything you've learned!",
-      "user_goal":[
-        {"title":"Agree with him about the weather",
-          "prompt":"Goedemiddag! Mooi weer, hè?"},
-        {"title":"Introduce yourself politely",
-          "prompt":"Zeker! Ik ben meneer De Wit. Aangenaam.",
+      "scenario_id": "IPM01_S02",
+      "title": "Making a new friend",
+      "setting": "You're enjoying the day in a Dutch park. Someone sits next to you and starts a conversation. Use everything you've learned!",
+      "user_goal": [
+        {
+          "title": "Greet him back and introduce yourself.",
+          "prompt": "Hallo.",
           "extract_info": {
-            "user_name": "Extract the user's name from their message"
-          }},
-        {"title":"Ask him where he is from",
-          "prompt":"Aangenaam, {user_name}. Ik ben een Nederlander."},
-        {"title":"Tell him where you are from",
-          "prompt":"Waar komt u vandaan?",
+            "user_name": "Extract the user's name from their message."
+          }
+        },
+        {
+          "title": "Say where you're from and then ask him where he is from.",
+          "prompt": "Aangenaam, {user_name}. Ik heet Lars. Waar kom je vandaan?",
           "extract_info": {
-            "user_country": "Extract the user's country from their message"
-          }},
-        {"title":"Answer his question about the Dutch language",
-          "prompt":"Ah, {user_country}! Interessant. Spreekt u al een beetje Nederlands?"},
-        {"title":"Say goodbye",
-          "prompt":"Dat is goed om te horen. Nou, een fijne dag verder!"}
+            "user_country": "Extract the user's country from their message."
+          }
+        },
+        {
+          "title": "Answer 'yes'.",
+          "prompt": "Ik kom uit Nederland. Leuk dat je uit {user_country} komt! Spreek je Engels?"
+        },
+        {
+          "title": "Say 'Nice to meet you'.",
+          "prompt": "Fijn. Ik spreek ook Engels."
+        }
       ]
     }
   ]
 },
 
 {
-  "id": "L02",
+  "id": "AHF02",
   "title": "At home: family and address",
   "content": [
     {
       "type": "tip",
-      "text": "Welkom bij Les 2! Today we'll learn to talk about our family, home, and how to share contact information."
-    },
-    { "type": "vocabulary", "item_id": "L02_V01", "data": { "De familie": "The family" } },
-    { "type": "vocabulary", "item_id": "L02_V02", "data": { "De ouders": "The parents" } },
-    { "type": "vocabulary", "item_id": "L02_V03", "data": { "De moeder": "The mother" } },
-    { "type": "vocabulary", "item_id": "L02_V04", "data": { "De vader": "The father" } },
-    { "type": "vocabulary", "item_id": "L02_V05", "data": { "De zus": "The sister" } },
-    { "type": "vocabulary", "item_id": "L02_V06", "data": { "De broer": "The brother" } },
-    {
-      "type": "pronunciation",
-      "item_id": "L02_P01",
-      "data": { "word": "Broer", "phonetic": "BROOR", "tip": "The Dutch 'r' is often rolled or tapped with the tongue, especially in the middle or at the end of a word." }
+      "text": "Welkom terug! Let's learn to talk about your home, family, and share contact information. We'll start with how to talk about your things."
     },
     {
       "type": "grammar",
-      "item_id": "L02_G01",
-      "title": "Possessive Adjectives",
-      "explanation": "To show ownership (my, your, his), you use possessive adjectives. Let's learn the singular ones first."
+      "item_id": "AHF02_G01",
+      "title": "Articles: 'De' and 'Het'",
+      "explanation": "Remember 'de' and 'het' both mean 'the'. It's important to learn the article with the noun, as it affects other grammar points."
     },
-    { "type": "grammar", "item_id": "L02_G02", "title": "My", "explanation": "Mijn" },
-    { "type": "grammar", "item_id": "L02_G03", "title": "Your (informal)", "explanation": "Jouw / Je" },
-    { "type": "grammar", "item_id": "L02_G04", "title": "Your (formal)", "explanation": "Uw" },
-    { "type": "grammar", "item_id": "L02_G05", "title": "His", "explanation": "Zijn" },
-    { "type": "grammar", "item_id": "L02_G06", "title": "Her", "explanation": "Haar" },
+    {
+      "type": "vocabulary",
+      "item_id": "AHF02_V01",
+      "data": {
+        "Het huis": "The house"
+      }
+    },
+    {
+      "type": "grammar",
+      "item_id": "AHF02_G02",
+      "title": "Possessive Adjective: mijn",
+      "explanation": "'Mijn' means 'my' and can be used for both 'de' and 'het' words. For example: 'mijn huis'."
+    },
+    {
+      "type": "pronunciation",
+      "item_id": "AHF02_P01",
+      "data": {
+        "word": "huis",
+        "phonetic": "hows",
+        "tip": "The 'ui' sound is unique. It's like saying 'ow' in 'how', but with more rounded lips."
+      }
+    },
+    {
+      "type": "expression",
+      "item_id": "AHF02_E01",
+      "data": {
+        "phrase": "Ik heb ...",
+        "meaning": "I have ..."
+      }
+    },
     {
       "type": "tip",
-      "text": "For example: 'Mijn broer' means 'My brother'. 'Haar zus' means 'Her sister'."
+      "text": "You can use 'Ik heb...' to talk about your family. For example: 'Ik heb een moeder.'"
     },
-    { "type": "expression", "item_id": "L02_E01", "data": { "phrase": "Ik heb ...", "meaning": "I have ..." } },
     {
-      "type": "tip",
-      "text": "You can use 'Ik heb' to talk about your family. For example: 'Ik heb een broer en een zus.' (I have a brother and a sister)."
+      "type": "vocabulary",
+      "item_id": "AHF02_V02",
+      "data": {
+        "De moeder": "The mother"
+      }
+    },
+    {
+      "type": "grammar",
+      "item_id": "AHF02_G03",
+      "title": "Possessive Adjective: jouw",
+      "explanation": "'Jouw' means 'your' (informal). For example: 'jouw moeder'."
+    },
+    {
+      "type": "vocabulary",
+      "item_id": "AHF02_V03",
+      "data": {
+        "De broer": "The brother"
+      }
+    },
+    {
+      "type": "grammar",
+      "item_id": "AHF02_G04",
+      "title": "Possessives: zijn & haar",
+      "explanation": "'Zijn' means 'his' and 'haar' means 'her'. For example: 'zijn broer', 'haar huis'."
+    },
+    {
+      "type": "pronunciation",
+      "item_id": "AHF02_P02",
+      "data": {
+        "word": "broer",
+        "phonetic": "broor",
+        "tip": "The 'r' is a rolling 'r' sound, common in Dutch."
+      }
+    },
+    {
+      "type": "vocabulary",
+      "item_id": "AHF02_V04",
+      "data": {
+        "De tafel": "The table"
+      }
     },
     {
       "type": "interactive_scenario",
-      "scenario_id": "L02_S01",
-      "title": "Chatting about Family",
-      "setting": "You're getting to know a new Dutch friend, Mark. He starts asking about your family.",
-      "user_goal":[
-        {"title":"Tell Mark about your family",
-          "prompt":"Hoi! Ik ben Mark. Ik heb één zus. Heb jij broers of zussen?"},
-        {"title":"Tell him your father's name",
-          "prompt":"Leuk! En hoe heet jouw vader?",
+      "scenario_id": "AHF02_S01",
+      "title": "Showing Family Photos",
+      "setting": "You are at your new Dutch friend's house, and they are showing you a family photo.",
+      "user_goal": [
+        {
+          "title": "Say you have a brother.",
+          "prompt": "Kijk, dit is mijn moeder. Heb jij een broer?"
+        },
+        {
+          "title": "Tell him your brother's name.",
+          "prompt": "Leuk! Hoe heet hij?",
           "extract_info": {
-            "father_name": "Extract the user's father's name from the message"
-          }},
-        {"title":"Respond to his comment",
-          "prompt":"Oké, dus zijn naam is {father_name}. Wat een leuke naam!"}
+            "brother_name": "Extract the brother's name from the user's message."
+          }
+        },
+        {
+          "title": "Say 'His house is nice.'",
+          "prompt": "Ah, {brother_name}. Dat is een mooie naam."
+        }
       ]
     },
     {
-      "type": "grammar",
-      "item_id": "L02_G07",
-      "title": "Numbers 0–10",
-      "explanation": "0: nul, 1: een, 2: twee, 3: drie, 4: vier, 5: vijf, 6: zes, 7: zeven, 8: acht, 9: negen, 10: tien."
+      "type": "tip",
+      "text": "Goed gedaan! Now let's learn how to ask and answer questions about age. For that, we need numbers!"
     },
     {
       "type": "grammar",
-      "item_id": "L02_G08",
-      "title": "Numbers 11–20",
-      "explanation": "11: elf, 12: twaalf, 13: dertien, 14: veertien, 15: vijftien, 16: zestien, 17: zeventien, 18: achttien, 19: negentien, 20: twintig."
+      "item_id": "AHF02_G05",
+      "title": "Numbers 0-10",
+      "explanation": "0-nul, 1-een, 2-twee, 3-drie, 4-vier, 5-vijf, 6-zes, 7-zeven, 8-acht, 9-negen, 10-tien."
     },
-    { "type": "expression", "item_id": "L02_E02", "data": { "phrase": "Hoe oud ben je?", "meaning": "How old are you?" } },
-    { "type": "expression", "item_id": "L02_E03", "data": { "phrase": "Ik ben ... jaar oud.", "meaning": "I am ... years old." } },
-    { "type": "vocabulary", "item_id": "L02_V07", "data": { "Het huis": "The house" } },
-    { "type": "vocabulary", "item_id": "L02_V08", "data": { "De kamer": "The room" } },
-    { "type": "vocabulary", "item_id": "L02_V09", "data": { "De straat": "The street" } },
-    { "type": "vocabulary", "item_id": "L02_V10", "data": { "Het huisnummer": "The house number" } },
-    { "type": "vocabulary", "item_id": "L02_V11", "data": { "De postcode": "The postal code" } },
-    { "type": "vocabulary", "item_id": "L02_V12", "data": { "De stad": "The city" } },
     {
       "type": "grammar",
-      "item_id": "L02_G09",
-      "title": "Articles: 'De' and 'Het' Review",
-      "explanation": "Remember that all nouns use 'de' or 'het' for 'the'. 'Het' is for neuter nouns, 'de' is for masculine/feminine nouns. Plurals always use 'de'."
+      "item_id": "AHF02_G06",
+      "title": "Numbers 11-20",
+      "explanation": "11-elf, 12-twaalf, 13-dertien, 14-veertien, 15-vijftien, 16-zestien, 17-zeventien, 18-achttien, 19-negentien, 20-twintig."
     },
     {
-      "type": "pronunciation",
-      "item_id": "L02_P02",
-      "data": { "word": "Huis", "phonetic": "HOUSE", "tip": "The 'ui' sound is unique to Dutch. It sounds like the 'ou' in the English word 'house' but with more rounded lips." }
+      "type": "expression",
+      "item_id": "AHF02_E02",
+      "data": {
+        "phrase": "Hoe oud ben je?",
+        "meaning": "How old are you?"
+      }
     },
-    { "type": "expression", "item_id": "L02_E04", "data": { "phrase": "Ik woon in ...", "meaning": "I live in ..." } },
     {
       "type": "tip",
-      "text": "You can use this for cities or countries. Example: 'Ik woon in Amsterdam.'"
-    },
-    { "type": "expression", "item_id": "L02_E05", "data": { "phrase": "Wat is je adres?", "meaning": "What is your address?" } },
-    {
-      "type": "grammar",
-      "item_id": "L02_G10",
-      "title": "Plurals: adding -en",
-      "explanation": "A very common way to make a noun plural is to add '-en'. For example, 'de straat' (the street) becomes 'de straten' (the streets)."
+      "text": "To answer 'Hoe oud ben je?', you can say: 'Ik ben [number] jaar oud.' or simply 'Ik ben [number].'"
     },
     {
       "type": "grammar",
-      "item_id": "L02_G11",
-      "title": "Plurals: adding -s",
-      "explanation": "Another common way to form a plural is by adding '-s'. For example, 'de kamer' (the room) becomes 'de kamers' (the rooms)."
+      "item_id": "AHF02_G07",
+      "title": "Numbers 20-100",
+      "explanation": "Tens: 20-twintig, 30-dertig, 40-veertig, 50-vijftig, 60-zestig, 70-zeventig, 80-tachtig, 90-negentig, 100-honderd."
+    },
+    {
+      "type": "tip",
+      "text": "For numbers like 21, you say 'een-en-twintig' (one-and-twenty). This pattern continues for other numbers."
+    },
+    {
+      "type": "expression",
+      "item_id": "AHF02_E03",
+      "data": {
+        "phrase": "Ik woon in...",
+        "meaning": "I live in..."
+      }
+    },
+    {
+      "type": "vocabulary",
+      "item_id": "AHF02_V05",
+      "data": {
+        "Het adres": "The address"
+      }
+    },
+    {
+      "type": "vocabulary",
+      "item_id": "AHF02_V06",
+      "data": {
+        "De stad": "The city"
+      }
+    },
+    {
+      "type": "expression",
+      "item_id": "AHF02_E04",
+      "data": {
+        "phrase": "Wat is je adres?",
+        "meaning": "What is your address?"
+      }
     },
     {
       "type": "grammar",
-      "item_id": "L02_G12",
-      "title": "Possessive Adjectives (Plural)",
-      "explanation": "Now for the plural forms of 'our', 'your', and 'their'."
-    },
-    { "type": "grammar", "item_id": "L02_G13", "title": "Our", "explanation": "Ons / Onze. Use 'ons' for 'het' words (ons huis) and 'onze' for 'de' words (onze familie)." },
-    { "type": "grammar", "item_id": "L02_G14", "title": "Your (plural)", "explanation": "Jullie. Used when speaking to more than one person. Example: 'Jullie huis is groot.'" },
-    { "type": "grammar", "item_id": "L02_G15", "title": "Their", "explanation": "Hun. Example: 'Hun ouders wonen in Utrecht.'" },
-    {
-      "type": "grammar",
-      "item_id": "L02_G16",
-      "title": "Numbers: The Tens",
-      "explanation": "20: twintig, 30: dertig, 40: veertig, 50: vijftig, 60: zestig, 70: zeventig, 80: tachtig, 90: negentig, 100: honderd."
+      "item_id": "AHF02_G08",
+      "title": "Possessive Adjective: uw",
+      "explanation": "Use 'uw' for the formal 'your'. Example: 'Wat is uw adres?'"
     },
     {
-      "type": "grammar",
-      "item_id": "L02_G17",
-      "title": "Numbers: 21-99",
-      "explanation": "Dutch numbers are read from right to left. 21 is 'eenentwintig' (one-and-twenty). 45 is 'vijfenveertig' (five-and-forty)."
+      "type": "expression",
+      "item_id": "AHF02_E05",
+      "data": {
+        "phrase": "Wat is je telefoonnummer?",
+        "meaning": "What is your phone number?"
+      }
     },
-    { "type": "vocabulary", "item_id": "L02_V13", "data": { "Het telefoonnummer": "The phone number" } },
-    { "type": "vocabulary", "item_id": "L02_V14", "data": { "Het e-mailadres": "The email address" } },
-    { "type": "expression", "item_id": "L02_E06", "data": { "phrase": "Wat is je telefoonnummer?", "meaning": "What is your phone number?" } },
+    {
+      "type": "vocabulary",
+      "item_id": "AHF02_V07",
+      "data": {
+        "Het telefoonnummer": "The phone number"
+      }
+    },
+    {
+      "type": "grammar",
+      "item_id": "AHF02_G09",
+      "title": "Plurals: adding -s or -en",
+      "explanation": "A common way to make nouns plural is to add -s (tafel -> tafels) or -en (stoel -> stoelen). We'll explore more rules later."
+    },
+    {
+      "type": "vocabulary",
+      "item_id": "AHF02_V08",
+      "data": {
+        "De stoel": "The chair"
+      }
+    },
+    {
+      "type": "grammar",
+      "item_id": "AHF02_G10",
+      "title": "Plural Possessives: ons/onze, jullie, hun",
+      "explanation": "'ons/onze' (our), 'jullie' (your, plural), 'hun' (their). Use 'ons' for 'het'-words (ons huis) and 'onze' for 'de'-words (onze tafel)."
+    },
+    {
+      "type": "vocabulary",
+      "item_id": "AHF02_V09",
+      "data": {
+        "De kamer": "The room"
+      }
+    },
+    {
+      "type": "tip",
+      "text": "Let's put it all together! You're ready to exchange personal information with a new acquaintance."
+    },
     {
       "type": "interactive_scenario",
-      "scenario_id": "L02_S02",
-      "title": "Getting a Library Card",
-      "setting": "You are at the local library ('de bibliotheek') to get a membership card. The librarian asks for your contact information. Remember to be formal ('u'/'uw').",
-      "user_goal":[
-        {"title":"Give the librarian your street and house number",
-          "prompt":"Goedemiddag. Ik help u graag. Wat is uw adres?",
+      "scenario_id": "AHF02_S02",
+      "title": "Exchanging Contact Info",
+      "setting": "You're signing up for a library card and the librarian is asking for your details. Use formal language.",
+      "user_goal": [
+        {
+          "title": "Tell the librarian your age.",
+          "prompt": "Goedemiddag. Ik help u graag. Hoe oud bent u?",
           "extract_info": {
-            "user_street": "Extract the user's street name from the message",
-            "user_housenumber": "Extract the user's house number from the message"
-          }},
-        {"title":"Tell them which city you live in",
-          "prompt":"Dank u. De {user_street} nummer {user_housenumber}. En in welke stad woont u?",
+            "user_age": "Extract the user's age from their message."
+          }
+        },
+        {
+          "title": "Give your address.",
+          "prompt": "Oké, {user_age} jaar. En wat is uw adres?",
           "extract_info": {
-            "user_city": "Extract the user's city from their message"
-          }},
-        {"title":"Provide your phone number",
-          "prompt":"Prima, {user_city}. En wat is uw telefoonnummer, alstublieft?"},
-        {"title":"Say thank you",
-          "prompt":"Perfect. Uw bibliotheekpas is klaar. Alstublieft."}
+            "user_address": "Extract the user's address from their message."
+          }
+        },
+        {
+          "title": "Give your phone number.",
+          "prompt": "Dank u. Adres is {user_address}. En als laatste, wat is uw telefoonnummer?",
+          "extract_info": {
+            "user_phone": "Extract the user's phone number from their message."
+          }
+        },
+        {
+          "title": "Say 'Thank you'.",
+          "prompt": "Perfect. Uw telefoonnummer is {user_phone}. Alles is in orde. Hier is uw bibliotheekpas."
+        }
       ]
     }
   ]
 }
+
 
 
 

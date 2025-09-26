@@ -3,6 +3,8 @@ import flet as ft
 from billing_manager import billing_manager
 import config
 
+from ui_components import CustomAppBar
+
 def PremiumView(page: ft.Page):
     """Premium unlock view for in-app purchase"""
     
@@ -106,19 +108,13 @@ def PremiumView(page: ft.Page):
     return ft.View(
         "/premium",
         controls=[
-            ft.AppBar(
-                title=ft.Text(
-                    "Unlock Premium",
-                    size=20,
-                    weight=ft.FontWeight.W_600
-                ),
+            CustomAppBar(
+                title="Unlock Premium",
+                page=page,
                 leading=ft.IconButton(
                     icon=ft.Icons.ARROW_BACK,
                     on_click=go_back
-                ),
-                center_title=True,
-                bgcolor=ft.Colors.TRANSPARENT,
-                elevation=0
+                )
             ),
             ft.Container(
                 content=ft.Column([

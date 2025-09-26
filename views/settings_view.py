@@ -1,11 +1,11 @@
 # views/settings_view.py
 import flet as ft
 import config
-import json
-import os
+from settings_manager import SettingsManager
 
-def SettingsView(page: ft.Page, llm_client=None):
-    # Create input field for API key
+from ui_components import CustomAppBar
+
+def SettingsView(page: ft.Page, settings_manager: SettingsManager):
     api_key_field = ft.TextField(
         label=config.get_text("api_key_label", "DeepSeek API Key"),
         password=True,
@@ -15,68 +15,24 @@ def SettingsView(page: ft.Page, llm_client=None):
         value=config.get_user_api_key() or ""
     )
     
-    # Status message
     status_message = ft.Text(
         value="",
         size=14,
         text_align=ft.TextAlign.CENTER
     )
     
-    def save_api_key(e):
-        """Save the API key to user settings"""
-        api_key = api_key_field.value.strip()
-        
-        if not api_key:
-            status_message.value = config.get_text("api_key_empty_error", "Please enter an API key")
-            status_message.color = ft.Colors.RED
-        else:
-            try:
-                config.save_user_api_key(api_key)
-                status_message.value = config.get_text("api_key_saved", "API key saved successfully!")
-                status_message.color = ft.Colors.GREEN
-                
-                # Update the global API key
-                config.update_runtime_api_key(api_key)
-                
-                # Update the LLM client with the new API key
-                if llm_client:
-                    llm_client.update_api_key()
-                
-            except Exception as ex:
-                status_message.value = config.get_text("api_key_save_error", "Error saving API key: {error}").format(error=str(ex))
-                status_message.color = ft.Colors.RED
-        
-        page.update()
+    def save_api_key_click(e):
+        settings_manager.save_api_key(api_key_field.value.strip(), status_message)
     
-    def clear_api_key(e):
-        """Clear the saved API key"""
-        try:
-            config.clear_user_api_key()
-            api_key_field.value = ""
-            status_message.value = config.get_text("api_key_cleared", "API key cleared successfully!")
-            status_message.color = ft.Colors.ORANGE
-            
-            # Reset to default API key
-            config.update_runtime_api_key(None)
-            
-            # Update the LLM client
-            if llm_client:
-                llm_client.update_api_key()
-            
-        except Exception as ex:
-            status_message.value = config.get_text("api_key_clear_error", "Error clearing API key: {error}").format(error=str(ex))
-            status_message.color = ft.Colors.RED
-        
-        page.update()
+    def clear_api_key_click(e):
+        settings_manager.clear_api_key(api_key_field, status_message)
     
     def go_back(e):
-        """Navigate back to home"""
         page.go("/")
     
-    # Save and Clear buttons
     save_button = ft.ElevatedButton(
         text=config.get_text("save", "Save"),
-        on_click=save_api_key,
+        on_click=save_api_key_click,
         style=ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=12),
             padding=ft.padding.symmetric(horizontal=24, vertical=12)
@@ -85,14 +41,13 @@ def SettingsView(page: ft.Page, llm_client=None):
     
     clear_button = ft.OutlinedButton(
         text=config.get_text("clear", "Clear"),
-        on_click=clear_api_key,
+        on_click=clear_api_key_click,
         style=ft.ButtonStyle(
             shape=ft.RoundedRectangleBorder(radius=12),
             padding=ft.padding.symmetric(horizontal=24, vertical=12)
         )
     )
     
-    # Information card
     info_card = ft.Card(
         content=ft.Container(
             content=ft.Column([
@@ -123,28 +78,13 @@ def SettingsView(page: ft.Page, llm_client=None):
     return ft.View(
         "/settings",
         controls=[
-            ft.AppBar(
-                title=ft.Row([
-                    ft.Image(
-                        src="assets/logo.svg",
-                        width=28,
-                        height=28,
-                        fit=ft.ImageFit.CONTAIN
-                    ),
-                    ft.Container(width=10),
-                    ft.Text(
-                        config.get_text("settings", "Settings"),
-                        size=20,
-                        weight=ft.FontWeight.W_600
-                    )
-                ], alignment=ft.MainAxisAlignment.CENTER),
+            CustomAppBar(
+                title=config.get_text("settings", "Settings"),
+                page=page,
                 leading=ft.IconButton(
                     icon=ft.Icons.ARROW_BACK,
                     on_click=go_back
-                ),
-                center_title=True,
-                bgcolor=ft.Colors.TRANSPARENT,
-                elevation=0
+                )
             ),
             ft.Container(
                 content=ft.Column([

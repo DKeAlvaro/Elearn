@@ -14,7 +14,11 @@ class AppState:
         self.interactive_scenario_progress = {}  # Track interactive scenario progress
         self.lesson_slide_positions = {}  # Track current slide position for each lesson
         self.progress_file = "progress.json"  # File to persist progress
+        self.has_premium = False
         self.load_progress()
+
+    def update_premium_status(self, has_premium: bool):
+        self.has_premium = has_premium
 
     def select_lesson(self, lesson_id: str):
         """Selecciona una lección para empezar."""
@@ -99,28 +103,31 @@ class AppState:
                 del self.interactive_scenario_progress[lesson_id]
             self.save_progress()
     
-    def is_lesson_unlocked(self, lesson_id: str) -> bool:
-        """Verifica si una lección está desbloqueada para ser jugada."""
-        # La primera lección (L01) siempre está desbloqueada
-        if lesson_id == "L01":
-            return True
+    def is_lesson_unlocked(self, lesson_id: str, has_premium: bool) -> bool:
+        """Verifica si una lección está desbloqueada, considerando el estado premium."""
+        try:
+            lesson_num = int(lesson_id.replace('L', '').lstrip('0') or '0')
+        except (ValueError, AttributeError):
+            return False  # No se puede determinar, bloquear por defecto
+
+        is_premium_lesson = (lesson_num % 4 == 1)
         
-        # Para otras lecciones, verificar que la anterior esté completada
-        lessons = self.data_manager.get_lessons()
-        lesson_index = None
+        # La lección está desbloqueada si no es premium, o si el usuario tiene premium
+        if not is_premium_lesson or has_premium:
+            # Para lecciones no premium o con premium, verificar la progresión
+            if lesson_num == 1:
+                return True
+            
+            lessons = self.data_manager.get_lessons()
+            previous_lesson_id = f"L{lesson_num - 1:02d}"
+            
+            # Asegurarse de que la lección anterior exista
+            if any(lesson.get("id") == previous_lesson_id for lesson in lessons):
+                return self.is_lesson_completed(previous_lesson_id)
+            return False # La lección anterior no existe
         
-        # Encontrar el índice de la lección actual
-        for i, lesson in enumerate(lessons):
-            if lesson.get("id") == lesson_id:
-                lesson_index = i
-                break
-        
-        if lesson_index is None or lesson_index == 0:
-            return True
-        
-        # Verificar que la lección anterior esté completada
-        previous_lesson = lessons[lesson_index - 1]
-        return self.is_lesson_completed(previous_lesson.get("id"))
+        # Si es una lección premium y el usuario no tiene premium, está bloqueada
+        return False
     
     def load_progress(self):
         """Carga el progreso desde el archivo."""
