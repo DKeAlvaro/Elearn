@@ -126,8 +126,15 @@ class LessonView(ft.View):
                 
                 goal_row = ft.Row([
                     ft.Icon(ft.Icons.ARROW_FORWARD, color=ft.Colors.BLUE, size=20),
-                    ft.Text(goal_title, size=16, color=ft.Colors.BLUE_700, weight=ft.FontWeight.BOLD)
-                ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+                    ft.Text(
+                        goal_title, 
+                        size=16, 
+                        color=ft.Colors.BLUE_700, 
+                        weight=ft.FontWeight.BOLD,
+                        expand=True,
+                        text_align=ft.TextAlign.LEFT
+                    )
+                ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.START)
                 
                 slide.progress_container.controls.append(goal_row)
             

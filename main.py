@@ -13,18 +13,22 @@ from billing_manager import billing_manager
 from settings_manager import SettingsManager
 
 def create_loading_screen():
-    return ft.Column([
-        ft.Image(
-            src="assets/logo.svg",
-            width=120,
-            height=120,
-            fit=ft.ImageFit.CONTAIN
-        ),
-        ft.Container(height=30),
-        ft.ProgressRing(width=40, height=40, stroke_width=4)
-    ], 
-    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-    alignment=ft.MainAxisAlignment.CENTER)
+    return ft.Container(
+        content=ft.Column([
+            ft.Image(
+                src="assets/logo.svg",
+                width=120,
+                height=120,
+                fit=ft.ImageFit.CONTAIN
+            ),
+            ft.Container(height=30),
+            ft.ProgressRing(width=40, height=40, stroke_width=4)
+        ], 
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+        alignment=ft.MainAxisAlignment.CENTER),
+        padding=ft.padding.only(top=100),
+        expand=True
+    )
 
 def main(page: ft.Page):
     page.title = config.get_text("app_title", "Language Learning App")

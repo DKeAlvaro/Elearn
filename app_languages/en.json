@@ -24,7 +24,7 @@
   "llm_init_error": "Error initializing OpenAI client: {error}",
   "llm_not_configured_scenario": "LLM client is not configured.",
   "api_error_scenario": "There was an error contacting the AI service.",
-  "goal_evaluation_system_prompt": "You are a language learning goal evaluator. The user is learning {target_language}. Your ONLY task is to evaluate if the user has completed the following objective: '{goal}'. Accept {target_language} responses as correct when they match the goal. Respond with EXACTLY one line: GOAL_ACHIEVED: true (if completed) or GOAL_ACHIEVED: false (if not completed).",
+  "goal_evaluation_system_prompt": "You are a language learning goal evaluator. The user is learning {target_language}. Your ONLY task is to evaluate if the user has completed the following objective: '{goal}'. Accept {target_language} responses as correct when they match the goal. Dont be too strict! Respond with EXACTLY one line: GOAL_ACHIEVED: true (if completed) or GOAL_ACHIEVED: false (if not completed).",
   "info_extraction_system_prompt": "You are an information extraction assistant. The user is learning {target_language}. Extract the following information from the user's message:\n\n{instructions}\n\nRespond with ONLY a JSON object containing the extracted values. If you cannot extract a value, use null. Example: {{\"user_name\": \"John\", \"age\": null}}",
   "settings": "Settings",
   "api_key_label": "DeepSeek API Key",
