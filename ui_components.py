@@ -116,6 +116,51 @@ class ExtraSlide(BaseSlide):
         ]
         super().__init__(controls)
 
+class AppLogo(ft.Image):
+    """A reusable component for the app logo."""
+    def __init__(self, width=150, height=150):
+        super().__init__(
+            src="assets/logo.svg",
+            width=width,
+            height=height,
+            fit=ft.ImageFit.CONTAIN,
+        )
+
+class Title(ft.Text):
+    """A reusable component for titles."""
+    def __init__(self, value: str, size: int = 28, weight: ft.FontWeight = ft.FontWeight.BOLD, font_family: str = "Poppins"):
+        super().__init__(
+            value=value,
+            size=size,
+            weight=weight,
+            font_family=font_family,
+        )
+
+class Subtitle(ft.Text):
+    """A reusable component for subtitles."""
+    def __init__(self, value: str, size: int = 16, weight: ft.FontWeight = ft.FontWeight.W_400, color: str = ft.Colors.GREY_600, text_align: ft.TextAlign = ft.TextAlign.CENTER, font_family: str = "Inter"):
+        super().__init__(
+            value=value,
+            size=size,
+            weight=weight,
+            color=color,
+            text_align=text_align,
+            font_family=font_family,
+        )
+
+class PrimaryButton(ft.FilledButton):
+    """A reusable component for primary buttons."""
+    def __init__(self, text: str, on_click: callable, width: int = 220):
+        super().__init__(
+            text=text,
+            on_click=on_click,
+            style=ft.ButtonStyle(
+                shape=ft.RoundedRectangleBorder(radius=8),
+                padding=ft.padding.symmetric(horizontal=32, vertical=16),
+            ),
+            width=width,
+        )
+
 class PronunciationSlide(BaseSlide):
     """Diapositiva para practicar la pronunciación."""
     def __init__(self, slide_data: dict):

@@ -9,6 +9,32 @@ class DataManager:
         self.lessons_folder = config.get_lessons_folder()
         self.lessons_file = os.path.join(self.lessons_folder, "lessons.json")
         self.lessons_data = self.load_lessons()
+        self.user_data_file = "user_data.json"
+        self.user_data = self.load_user_data()
+
+    def load_user_data(self):
+        """Loads user data from the JSON file."""
+        if not os.path.exists(self.user_data_file):
+            return {"first_run": True}
+        try:
+            with open(self.user_data_file, 'r', encoding='utf-8') as file:
+                return json.load(file)
+        except (FileNotFoundError, json.JSONDecodeError):
+            return {"first_run": True}
+
+    def save_user_data(self):
+        """Saves user data to the JSON file."""
+        with open(self.user_data_file, 'w', encoding='utf-8') as file:
+            json.dump(self.user_data, file, indent=4)
+
+    def is_first_run(self):
+        """Checks if it's the first time the app is run."""
+        return self.user_data.get("first_run", True)
+
+    def set_first_run_completed(self):
+        """Marks the first run as completed."""
+        self.user_data["first_run"] = False
+        self.save_user_data()
     
     def load_lessons(self):
         """Carga las lecciones desde el archivo JSON específico del idioma."""

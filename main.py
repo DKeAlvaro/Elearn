@@ -9,6 +9,7 @@ from views.home_view import HomeView
 from views.lesson_view import LessonView
 from views.settings_view import SettingsView
 from views.premium_view import PremiumView
+from views.intro_view import IntroView
 from billing_manager import billing_manager
 from settings_manager import SettingsManager
 
@@ -71,18 +72,23 @@ def main(page: ft.Page):
     # Remove loading screen after initialization
     page.clean()
 
+    def on_start_learning():
+        data_manager.set_first_run_completed()
+        page.go("/")
+
     # --- Enrutamiento ---
     def route_change(route):
         page.views.clear()
-        page.views.append(HomeView(page, app_state))
-
-        if page.route == "/lesson":
-            page.views.append(LessonView(page, app_state, llm_client))
-        elif page.route == "/settings":
-            page.views.append(SettingsView(page, settings_manager))
-        elif page.route == "/premium":
-            page.views.append(PremiumView(page))
-        
+        if page.route == "/intro":
+            page.views.append(IntroView(page, on_start_learning))
+        else:
+            page.views.append(HomeView(page, app_state))
+            if page.route == "/lesson":
+                page.views.append(LessonView(page, app_state, llm_client))
+            elif page.route == "/settings":
+                page.views.append(SettingsView(page, settings_manager))
+            elif page.route == "/premium":
+                page.views.append(PremiumView(page))
         page.update()
 
     def view_pop(view):
@@ -92,7 +98,11 @@ def main(page: ft.Page):
 
     page.on_route_change = route_change
     page.on_view_pop = view_pop
-    page.go(page.route)
+    
+    if data_manager.is_first_run():
+        page.go("/intro")
+    else:
+        page.go("/")
 
 if __name__ == "__main__":
-    ft.app(target=main)#, view=ft.AppView.WEB_BROWSER)
+    ft.app(target=main)
