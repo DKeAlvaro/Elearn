@@ -17,7 +17,7 @@ class LessonView(ft.View):
 
         self.slide_content_area = ft.Container(
             alignment=ft.alignment.center,
-            padding=20,
+            padding=ft.padding.only(left=20, right=20, top=20, bottom=5),
             expand=True
         )
 
@@ -47,8 +47,8 @@ class LessonView(ft.View):
                     spacing=20,
                     vertical_alignment=ft.CrossAxisAlignment.CENTER
                 ),
-                padding=ft.padding.only(bottom=20, left=16, right=16, top=10),
-                height=80
+                padding=ft.padding.only(bottom=10, left=16, right=16, top=0),
+                height=50
             )
         ]
         
@@ -70,9 +70,12 @@ class LessonView(ft.View):
             self.previous_button.opacity = 0.0
             self.previous_button.disabled = True
         
-        if is_last_slide:
-            slide_type = current_slide_data.get("type")
-            if slide_type in ["interactive_scenario", "llm_check"]:
+        slide_type = current_slide_data.get("type")
+        if slide_type == "interactive_scenario":
+            # Interactive scenarios start with next button disabled
+            self.next_button.disabled = True
+        elif is_last_slide:
+            if slide_type == "llm_check":
                 self.next_button.disabled = True
             else:
                 self.next_button.disabled = False
@@ -106,33 +109,30 @@ class LessonView(ft.View):
         def update_progress_ui():
             total_goals = len(self.app_state.scenario_user_goals)
             completed_count = len(self.app_state.scenario_completed_goals)
+            current_goal_index = self.app_state.scenario_current_goal_index
             
             slide.progress_container.controls.clear()
             
+            # Show progress indicator
+            progress_text = f"Objective {current_goal_index + 1} of {total_goals}"
             slide.progress_container.controls.append(
-                ft.Text("Objectives:", size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_GREY_700)
+                ft.Text(progress_text, size=14, weight=ft.FontWeight.W_500, color=ft.Colors.BLUE_GREY_600)
             )
             
-            for i, goal in enumerate(self.app_state.scenario_user_goals):
-                goal_title = goal["title"]
+            # Show only the current objective
+            if current_goal_index < len(self.app_state.scenario_user_goals):
+                current_goal = self.app_state.scenario_user_goals[current_goal_index]
+                goal_title = current_goal["title"]
                 
-                if i in self.app_state.scenario_completed_goals:
-                    goal_row = ft.Row([
-                        ft.Icon(ft.Icons.CHECK_CIRCLE, color=ft.Colors.GREEN, size=20),
-                        ft.Text(f"✓ {goal_title}", size=14, color=ft.Colors.GREEN_700, weight=ft.FontWeight.W_500)
-                    ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER)
-                elif i == self.app_state.scenario_current_goal_index:
-                    goal_row = ft.Row([
-                        ft.Icon(ft.Icons.ARROW_FORWARD, color=ft.Colors.BLUE, size=20),
-                        ft.Text(goal_title, size=14, color=ft.Colors.BLUE_700, weight=ft.FontWeight.BOLD)
-                    ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER)
-                else:
-                    goal_row = ft.Row([
-                        ft.Icon(ft.Icons.RADIO_BUTTON_UNCHECKED, color=ft.Colors.GREY_400, size=20),
-                        ft.Text(goal_title, size=14, color=ft.Colors.GREY_600)
-                    ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+                goal_row = ft.Row([
+                    ft.Icon(ft.Icons.ARROW_FORWARD, color=ft.Colors.BLUE, size=20),
+                    ft.Text(goal_title, size=16, color=ft.Colors.BLUE_700, weight=ft.FontWeight.BOLD)
+                ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER)
                 
                 slide.progress_container.controls.append(goal_row)
+            
+            # Always disable next button initially for interactive scenarios
+            self.next_button.disabled = True
             
             if completed_count >= total_goals and total_goals > 0:
                 slide.progress_container.controls.append(ft.Divider(height=10))
@@ -148,19 +148,17 @@ class LessonView(ft.View):
                     )
                 )
                 
+                # Only enable next button when all goals are completed
+                self.next_button.disabled = False
                 lesson_content = self.app_state.data_manager.get_lesson_content(self.app_state.current_lesson_id)
                 is_last_slide = self.app_state.current_slide_index == len(lesson_content) - 1
                 if is_last_slide:
-                    self.next_button.disabled = False
                     self.next_button.text = "Finalizar"
+                else:
+                    self.next_button.text = config.get_text("next")
                 
                 slide.send_button.disabled = True
                 slide.new_message.disabled = True
-            else:
-                lesson_content = self.app_state.data_manager.get_lesson_content(self.app_state.current_lesson_id)
-                is_last_slide = self.app_state.current_slide_index == len(lesson_content) - 1
-                if is_last_slide:
-                    self.next_button.disabled = True
             
             self.page.update()
 
@@ -170,7 +168,9 @@ class LessonView(ft.View):
                 goal_prompt = current_goal.get("prompt", "")
                 if goal_prompt:
                     try:
-                        formatted_prompt = goal_prompt.format(**self.app_state.scenario_extracted_info)
+                        # Use all available variables (global + scenario)
+                        all_variables = self.app_state.get_all_available_variables()
+                        formatted_prompt = goal_prompt.format(**all_variables)
                     except KeyError:
                         formatted_prompt = goal_prompt
                     
@@ -214,6 +214,8 @@ class LessonView(ft.View):
                         )
                         if extracted_data:
                             self.app_state.scenario_extracted_info.update(extracted_data)
+                            # Save extracted data to global user data storage
+                            self.app_state.save_user_data(extracted_data)
                 
                 import concurrent.futures
                 with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -252,7 +254,9 @@ class LessonView(ft.View):
                             next_goal_prompt = next_goal.get("prompt", "")
                             if next_goal_prompt:
                                 try:
-                                    chat_response = next_goal_prompt.format(**self.app_state.scenario_extracted_info)
+                                    # Use all available variables (global + scenario)
+                                    all_variables = self.app_state.get_all_available_variables()
+                                    chat_response = next_goal_prompt.format(**all_variables)
                                 except KeyError:
                                     chat_response = next_goal_prompt
                             else:
@@ -308,6 +312,7 @@ class LessonView(ft.View):
             
             slide.new_message.value = ""
             slide.send_button.disabled = False
+            slide.new_message.disabled = False
             
             update_progress_ui()
             
@@ -315,8 +320,15 @@ class LessonView(ft.View):
                 current_goal = self.app_state.scenario_user_goals[0]
                 goal_prompt = current_goal.get("prompt", "")
                 if goal_prompt:
-                    slide.scrollable_content.controls.append(ChatMessage(ft.Text(goal_prompt, selectable=True), is_user=False))
-                    self.app_state.scenario_chat_history.append({"role": "assistant", "content": goal_prompt})
+                    try:
+                        # Use all available variables (global + scenario)
+                        all_variables = self.app_state.get_all_available_variables()
+                        formatted_prompt = goal_prompt.format(**all_variables)
+                    except KeyError:
+                        formatted_prompt = goal_prompt
+                    
+                    slide.scrollable_content.controls.append(ChatMessage(ft.Text(formatted_prompt, selectable=True), is_user=False))
+                    self.app_state.scenario_chat_history.append({"role": "assistant", "content": formatted_prompt})
             
             self.page.update()
 

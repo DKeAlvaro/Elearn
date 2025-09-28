@@ -13,8 +13,17 @@ class AppState:
         self.completed_lessons = set()  # Track completed lessons
         self.interactive_scenario_progress = {}  # Track interactive scenario progress
         self.lesson_slide_positions = {}  # Track current slide position for each lesson
+        self.user_data = {}  # Global user data storage for extracted variables
         self.progress_file = "progress.json"  # File to persist progress
         self.has_premium = False
+        
+        # Scenario-related attributes
+        self.scenario_user_goals = []
+        self.scenario_completed_goals = set()
+        self.scenario_current_goal_index = 0
+        self.scenario_extracted_info = {}
+        self.scenario_chat_history = []
+        
         self.load_progress()
 
     def update_premium_status(self, has_premium: bool):
@@ -101,33 +110,116 @@ class AppState:
             del self.interactive_scenario_progress[lesson_id][scenario_id]
             if not self.interactive_scenario_progress[lesson_id]:  # Remove lesson entry if empty
                 del self.interactive_scenario_progress[lesson_id]
-            self.save_progress()
+    
+    def reset_scenario_state(self):
+        """Resets the current scenario state to initial values."""
+        # Save any extracted variables to global storage before clearing
+        if self.scenario_extracted_info:
+            self.save_user_data(self.scenario_extracted_info)
+        
+        self.scenario_completed_goals = set()
+        self.scenario_current_goal_index = 0
+        self.scenario_extracted_info = {}
+        self.scenario_chat_history = []
+    
+    def save_user_data(self, data: dict):
+        """Saves extracted variables to global user data storage."""
+        self.user_data.update(data)
+        self.save_progress()
+    
+    def get_user_data(self, key: str = None):
+        """Retrieves user data. If key is provided, returns that specific value, otherwise returns all data."""
+        if key:
+            return self.user_data.get(key)
+        return self.user_data.copy()
+    
+    def get_all_available_variables(self):
+        """Returns all available variables from both global user data and current scenario."""
+        all_vars = self.user_data.copy()
+        all_vars.update(self.scenario_extracted_info)
+        return all_vars
     
     def is_lesson_unlocked(self, lesson_id: str, has_premium: bool) -> bool:
         """Verifica si una lección está desbloqueada, considerando el estado premium."""
-        try:
-            lesson_num = int(lesson_id.replace('L', '').lstrip('0') or '0')
-        except (ValueError, AttributeError):
-            return False  # No se puede determinar, bloquear por defecto
-
-        is_premium_lesson = (lesson_num % 4 == 1)
+        lessons = self.data_manager.get_lessons()
         
-        # La lección está desbloqueada si no es premium, o si el usuario tiene premium
-        if not is_premium_lesson or has_premium:
-            # Para lecciones no premium o con premium, verificar la progresión
-            if lesson_num == 1:
-                return True
-            
-            lessons = self.data_manager.get_lessons()
-            previous_lesson_id = f"L{lesson_num - 1:02d}"
-            
-            # Asegurarse de que la lección anterior exista
-            if any(lesson.get("id") == previous_lesson_id for lesson in lessons):
-                return self.is_lesson_completed(previous_lesson_id)
-            return False # La lección anterior no existe
+        # Find the current lesson index
+        current_lesson_index = -1
+        for i, lesson in enumerate(lessons):
+            if lesson.get("id") == lesson_id:
+                current_lesson_index = i
+                break
         
-        # Si es una lección premium y el usuario no tiene premium, está bloqueada
-        return False
+        if current_lesson_index == -1:
+            return False  # Lesson not found
+        
+        # First lesson is always unlocked
+        if current_lesson_index == 0:
+            return True
+        
+        # For free users: every 4th lesson is locked (lessons 4, 8, 12, etc.)
+        # This means lesson numbers 4, 8, 12... (indices 3, 7, 11...) are premium-only
+        lesson_number = current_lesson_index + 1  # Convert 0-based index to 1-based lesson number
+        if not has_premium and lesson_number % 4 == 0:
+            return False  # Premium required for every 4th lesson
+        
+        # Check progression: find the most recent completed lesson that's accessible to this user
+        for i in range(current_lesson_index - 1, -1, -1):
+            previous_lesson = lessons[i]
+            previous_lesson_number = i + 1
+            previous_lesson_id = previous_lesson.get("id")
+            
+            # If this previous lesson is premium-locked for free users, skip it
+            if not has_premium and previous_lesson_number % 4 == 0:
+                continue
+            
+            # Check if this accessible previous lesson is completed
+            return self.is_lesson_completed(previous_lesson_id)
+        
+        # If no accessible previous lesson found, this means we're at lesson 1 or 2
+        return True
+    
+    def get_lesson_lock_reason(self, lesson_id: str, has_premium: bool) -> str:
+        """Returns the reason why a lesson is locked: 'unlocked', 'premium', or 'progression'."""
+        lessons = self.data_manager.get_lessons()
+        
+        # Find the current lesson index
+        current_lesson_index = -1
+        for i, lesson in enumerate(lessons):
+            if lesson.get("id") == lesson_id:
+                current_lesson_index = i
+                break
+        
+        if current_lesson_index == -1:
+            return "progression"  # Lesson not found, treat as progression lock
+        
+        # First lesson is always unlocked
+        if current_lesson_index == 0:
+            return "unlocked"
+        
+        # Check if this is a premium-only lesson for free users
+        lesson_number = current_lesson_index + 1  # Convert 0-based index to 1-based lesson number
+        if not has_premium and lesson_number % 4 == 0:
+            return "premium"  # Premium required for every 4th lesson
+        
+        # Check progression: find the most recent completed lesson that's accessible to this user
+        for i in range(current_lesson_index - 1, -1, -1):
+            previous_lesson = lessons[i]
+            previous_lesson_number = i + 1
+            previous_lesson_id = previous_lesson.get("id")
+            
+            # If this previous lesson is premium-locked for free users, skip it
+            if not has_premium and previous_lesson_number % 4 == 0:
+                continue
+            
+            # Check if this accessible previous lesson is completed
+            if self.is_lesson_completed(previous_lesson_id):
+                return "unlocked"
+            else:
+                return "progression"  # Previous lesson not completed
+        
+        # If no accessible previous lesson found, this means we're at lesson 1 or 2
+        return "unlocked"
     
     def load_progress(self):
         """Carga el progreso desde el archivo."""
@@ -138,11 +230,13 @@ class AppState:
                     self.completed_lessons = set(data.get('completed_lessons', []))
                     self.interactive_scenario_progress = data.get('interactive_scenario_progress', {})
                     self.lesson_slide_positions = data.get('lesson_slide_positions', {})
+                    self.user_data = data.get('user_data', {})
         except (FileNotFoundError, json.JSONDecodeError) as e:
             print(f"Error loading progress: {e}")
             self.completed_lessons = set()
             self.interactive_scenario_progress = {}
             self.lesson_slide_positions = {}
+            self.user_data = {}
     
     def save_progress(self):
         """Guarda el progreso al archivo."""
@@ -150,7 +244,8 @@ class AppState:
             data = {
                 'completed_lessons': list(self.completed_lessons),
                 'interactive_scenario_progress': self.interactive_scenario_progress,
-                'lesson_slide_positions': self.lesson_slide_positions
+                'lesson_slide_positions': self.lesson_slide_positions,
+                'user_data': self.user_data
             }
             with open(self.progress_file, 'w', encoding='utf-8') as f:
                 json.dump(data, f, ensure_ascii=False, indent=2)

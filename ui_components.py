@@ -137,10 +137,22 @@ class CustomAppBar(ft.AppBar):
             title=ft.Row([
                 ft.Image(src="assets/logo.svg", width=28, height=28, fit=ft.ImageFit.CONTAIN),
                 ft.Container(width=10),
-                ft.Text(title, size=20, weight=ft.FontWeight.W_600)
+                ft.Container(
+                    content=ft.Text(
+                        title, 
+                        size=20, 
+                        weight=ft.FontWeight.W_600,
+                        text_align=ft.TextAlign.CENTER,
+                        overflow=ft.TextOverflow.VISIBLE,
+                        no_wrap=False
+                    ),
+                    expand=True,
+                    alignment=ft.alignment.center
+                )
             ], alignment=ft.MainAxisAlignment.CENTER),
             center_title=True,
             bgcolor=ft.Colors.TRANSPARENT,
+            surface_tint_color=ft.Colors.TRANSPARENT,
             elevation=0,
             leading=leading,
             actions=actions
@@ -190,7 +202,7 @@ class InteractiveScenarioSlide(ft.Column):
                 )
             ],
             expand=True,
-            spacing=10
+            spacing=2
         )
 
 class LLMCheckSlide(ft.Column):
