@@ -147,8 +147,15 @@ class LessonView(ft.View):
                     ft.Container(
                         content=ft.Row([
                             ft.Icon(ft.Icons.CELEBRATION, color=ft.Colors.AMBER, size=24),
-                            ft.Text(config.get_text("all_goals_completed"), size=16, weight=ft.FontWeight.BOLD, color=ft.Colors.GREEN_700)
-                        ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                            ft.Text(
+                                config.get_text("all_goals_completed"), 
+                                size=16, 
+                                weight=ft.FontWeight.BOLD, 
+                                color=ft.Colors.GREEN_700,
+                                expand=True,
+                                text_align=ft.TextAlign.LEFT
+                            )
+                        ], spacing=8, vertical_alignment=ft.CrossAxisAlignment.START),
                         bgcolor=ft.Colors.with_opacity(0.1, ft.Colors.GREEN),
                         border_radius=8,
                         padding=10
