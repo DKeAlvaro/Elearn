@@ -17,7 +17,7 @@ The application follows a simple design pattern where the **UI is a reflection o
 - **AppState**: State manager that tracks the current lesson, slide, and theme.  
 - **main.py (Router)**: Decides which view to render depending on the route.  
 - **Views (HomeView, LessonView)**: Screen builders, define the layout and UI.  
-- **UIFactory**: Component factory that transforms JSON slide definitions into Flet controls.  
+- **UIComponents**: Reusable UI components for the application, including slide generators.
 - **LLMClient**: External service that communicates with the DeepSeek API for exercise correction.  
 
 ---
@@ -48,13 +48,9 @@ The application follows a simple design pattern where the **UI is a reflection o
 - **Purpose**: Encapsulate AI API logic.  
 - **Responsibilities**: Build system prompts, send user responses to DeepSeek, and return formatted corrections.  
 
-### **ui_factory.py**
-- **Purpose**: Convert JSON data into Flet components.  
-- **Responsibilities**: Map slide `type` (e.g. `"vocabulary"`) to specific controls (`ft.Text`, `ft.Column`, etc.).
-
 ### **ui_components.py**
 - **Purpose**: Reusable UI components for the application.
-- **Responsibilities**: Provides `ChatMessage` and `LoadingMessage` components. Both use the app logo for AI assistant avatars.
+- **Responsibilities**: Provides `ChatMessage` and `LoadingMessage` components, and class-based slide generators. Both use the app logo for AI assistant avatars.
 
 ### **assets/logo.svg**
 - **Purpose**: Application logo and branding.
@@ -79,7 +75,7 @@ The app will automatically render it.
 - Define the structure in `lessons.json`, for example:
 
 ```json
-{ 
+{
   "type": "multiple_choice",
   "question": "What does 'Mizu' mean?",
   "options": ["Water", "Fire", "Earth"],
@@ -90,8 +86,9 @@ The app will automatically render it.
 ## Implementing New Features
 
 ### UI Implementation
-- Implement the UI in `ui_factory.py` (e.g. `elif slide_type == "multiple_choice"`).  
-- Add interactivity in `lesson_view.py` if required.  
+- Implement the new slide class in `ui_components.py`.
+- Add the new slide type to the `create_slide_content` factory function in `ui_components.py`.
+- Add interactivity in `lesson_view.py` if required.
 
 ### Add a New Theme
 1. Open `config.py`.  
@@ -101,7 +98,6 @@ The app will automatically include it in the theme rotation.
 ---
 
 ## TODO List
-
 ### Core Features
 - [ ] Save user progress (using `page.client_storage` or local file).  
 - [ ] Add a progress bar in `LessonView`.  

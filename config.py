@@ -29,14 +29,14 @@ LANGUAGE_CONFIG = {
         "ui_language": "es",  # Spanish UI
         "learning_language": "Español",
         "target_language": "Neerlandés",
-        "lessons_folder": "lessons/es-nl"
+        "lessons_folder": "lessons/dutch/es-nl"
     },
     "en-nl": {
         "name": "English -> Dutch",
         "ui_language": "en",  # English UI
         "learning_language": "English", 
         "target_language": "Dutch",
-        "lessons_folder": "lessons/en-nl"
+        "lessons_folder": "lessons/dutch/en-nl"
     }
 }
 
