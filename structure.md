@@ -106,7 +106,7 @@ The app will automatically include it in the theme rotation.
 - [ ] Save user progress (using `page.client_storage` or local file).  
 - [ ] Add a progress bar in `LessonView`.  
 - [ ] Add a summary screen at the end of each lesson with scores.  
-- [ ] Implement final open conversation with LLM (with a personality prompt, e.g. "you are a waiter").  
+- [ ] Implement final open conversation with LLM (with a personality chatbot_message, e.g. "you are a waiter").  
 
 ### UI/UX Improvements
 - [x] **Logo Integration**: Added logo as app icon, loading screen, AI assistant avatar, and in all app bar headers.

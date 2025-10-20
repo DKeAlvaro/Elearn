@@ -73,7 +73,7 @@ class ExpressionSlide(BaseSlide):
         phrase = slide_data['data']['phrase']
         meaning = slide_data['data']['meaning']
         controls = [
-            ft.Text(f'"{phrase}"', size=32, text_align=ft.TextAlign.CENTER),
+            ft.Text(f'{phrase}', size=32, text_align=ft.TextAlign.CENTER),
             ft.Text(meaning, size=20, italic=True, text_align=ft.TextAlign.CENTER, color=ft.Colors.GREY)
         ]
         super().__init__(controls)
@@ -253,7 +253,7 @@ class InteractiveScenarioSlide(ft.Column):
 class LLMCheckSlide(ft.Column):
     """Diapositiva para que el LLM verifique la entrada del usuario."""
     def __init__(self, slide_data: dict):
-        self.prompt_text = ft.Text(slide_data['prompt'], size=20, text_align=ft.TextAlign.CENTER)
+        self.prompt_text = ft.Text(slide_data['chatbot_message'], size=20, text_align=ft.TextAlign.CENTER)
         self.answer_field = ft.TextField(label=config.get_text("your_answer", "Tu respuesta..."), width=300, text_align=ft.TextAlign.CENTER)
         self.check_button = ft.ElevatedButton(config.get_text("check_with_ai", "Comprobar con IA"))
         self.result_text = ft.Text(value="", size=16, text_align=ft.TextAlign.CENTER, italic=True)

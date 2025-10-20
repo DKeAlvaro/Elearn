@@ -67,7 +67,7 @@ def create_slide_content(slide_data: dict):
         }
 
     if slide_type == 'llm_check':
-        prompt_text = ft.Text(slide_data['prompt'], size=20, text_align=ft.TextAlign.CENTER)
+        prompt_text = ft.Text(slide_data['chatbot_message'], size=20, text_align=ft.TextAlign.CENTER)
         answer_field = ft.TextField(label=config.get_text("your_answer", "Tu respuesta..."), width=300, text_align=ft.TextAlign.CENTER)
         check_button = ft.ElevatedButton(config.get_text("check_with_ai", "Comprobar con IA"))
         result_text = ft.Text(value="", size=16, text_align=ft.TextAlign.CENTER, italic=True)
@@ -94,7 +94,7 @@ def create_slide_content(slide_data: dict):
         phrase = slide_data['data']['phrase']
         meaning = slide_data['data']['meaning']
         content_controls.extend([
-            ft.Text(f'"{phrase}"', size=32, text_align=ft.TextAlign.CENTER),
+            ft.Text(f'{phrase}', size=32, text_align=ft.TextAlign.CENTER),
             ft.Text(meaning, size=20, italic=True, text_align=ft.TextAlign.CENTER, color=ft.Colors.GREY)
         ])
 

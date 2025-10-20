@@ -45,7 +45,7 @@ class LLMClient:
         if not self.active or not config.get_effective_api_key():
             return f"CONCEPTS_COVERED: []\n{config.get_text('llm_not_configured_scenario', 'El cliente LLM no está configurado.')}"
 
-        # Convertir el dict de conceptos a un string para el prompt
+        # Convertir el dict de conceptos a un string para el chatbot_message
         concepts_json_str = json.dumps(concepts_to_check, ensure_ascii=False)
 
         system_prompt = config.get_text(

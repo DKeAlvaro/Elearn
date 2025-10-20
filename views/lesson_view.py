@@ -28,7 +28,7 @@ class LessonView(ft.View):
             disabled=True,
             opacity=0.0
         )
-        self.next_button = ft.ElevatedButton(on_click=self.go_next)
+        self.next_button = ft.ElevatedButton(text=config.get_text("next", "Siguiente"), on_click=self.go_next)
 
         self.controls = [
             CustomAppBar(
@@ -93,7 +93,7 @@ class LessonView(ft.View):
         self.page.update()
 
     def handle_interactive_scenario(self, slide: InteractiveScenarioSlide, slide_data: dict):
-        self.app_state.scenario_user_goals = slide_data.get("user_goal", [])
+        self.app_state.scenario_user_goals = slide_data.get("conversation_flow", [])
         
         scenario_id = slide_data.get("scenario_id", "")
         lesson_id = self.app_state.current_lesson_id
@@ -179,7 +179,7 @@ class LessonView(ft.View):
         if self.app_state.scenario_user_goals:
             if self.app_state.scenario_current_goal_index < len(self.app_state.scenario_user_goals):
                 current_goal = self.app_state.scenario_user_goals[self.app_state.scenario_current_goal_index]
-                goal_prompt = current_goal.get("prompt", "")
+                goal_prompt = current_goal.get("chatbot_message", "")
                 if goal_prompt:
                     try:
                         # Use all available variables (global + scenario)
@@ -211,7 +211,7 @@ class LessonView(ft.View):
             async def get_llm_response():
                 current_goal_index = self.app_state.scenario_current_goal_index
                 current_goal = self.app_state.scenario_user_goals[current_goal_index]["title"] if current_goal_index < len(self.app_state.scenario_user_goals) else ""
-                goal_prompt = self.app_state.scenario_user_goals[current_goal_index].get("prompt", "") if current_goal_index < len(self.app_state.scenario_user_goals) else ""
+                goal_prompt = self.app_state.scenario_user_goals[current_goal_index].get("chatbot_message", "") if current_goal_index < len(self.app_state.scenario_user_goals) else ""
                 
                 current_goal_data = self.app_state.scenario_user_goals[current_goal_index] if current_goal_index < len(self.app_state.scenario_user_goals) else {}
                 extract_info = current_goal_data.get("extract_info", {})
@@ -265,7 +265,7 @@ class LessonView(ft.View):
                         
                         if self.app_state.scenario_current_goal_index < len(self.app_state.scenario_user_goals):
                             next_goal = self.app_state.scenario_user_goals[self.app_state.scenario_current_goal_index]
-                            next_goal_prompt = next_goal.get("prompt", "")
+                            next_goal_prompt = next_goal.get("chatbot_message", "")
                             if next_goal_prompt:
                                 try:
                                     # Use all available variables (global + scenario)
@@ -332,7 +332,7 @@ class LessonView(ft.View):
             
             if self.app_state.scenario_user_goals:
                 current_goal = self.app_state.scenario_user_goals[0]
-                goal_prompt = current_goal.get("prompt", "")
+                goal_prompt = current_goal.get("chatbot_message", "")
                 if goal_prompt:
                     try:
                         # Use all available variables (global + scenario)
@@ -358,7 +358,7 @@ class LessonView(ft.View):
             slide.result_text.value = "Pensando..."
             self.page.update()
 
-            correction = self.llm_client.get_correction(user_input, slide_data["prompt"])
+            correction = self.llm_client.get_correction(user_input, slide_data["chatbot_message"])
             
             slide.result_text.value = correction
             slide.check_button.disabled = False
