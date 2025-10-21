@@ -230,11 +230,11 @@ class InteractiveScenarioSlide(ft.Column):
             spacing=10,
             auto_scroll=True
         )
-        self.new_message = ft.TextField(label=config.get_text("type_message", "Escribe tu mensaje..."), expand=True)
-        self.send_button = ft.ElevatedButton(config.get_text("send_message", "Enviar"))
+        self.new_message = ft.TextField(label=config.get_text("type_message", "Type your message..."), expand=True)
+        self.send_button = ft.ElevatedButton(config.get_text("send_message", "Send"))
         self.restart_button = ft.IconButton(
             icon=ft.Icons.REFRESH,
-            tooltip=config.get_text("restart_scenario", "Reiniciar escenario"),
+            tooltip=config.get_text("restart_scenario", "Restart scenario"),
             icon_size=20
         )
         
@@ -254,8 +254,8 @@ class LLMCheckSlide(ft.Column):
     """Diapositiva para que el LLM verifique la entrada del usuario."""
     def __init__(self, slide_data: dict):
         self.prompt_text = ft.Text(slide_data['chatbot_message'], size=20, text_align=ft.TextAlign.CENTER)
-        self.answer_field = ft.TextField(label=config.get_text("your_answer", "Tu respuesta..."), width=300, text_align=ft.TextAlign.CENTER)
-        self.check_button = ft.ElevatedButton(config.get_text("check_with_ai", "Comprobar con IA"))
+        self.answer_field = ft.TextField(label=config.get_text("your_answer", "Your answer..."), width=300, text_align=ft.TextAlign.CENTER)
+        self.check_button = ft.ElevatedButton(config.get_text("check_with_ai", "Check with AI"))
         self.result_text = ft.Text(value="", size=16, text_align=ft.TextAlign.CENTER, italic=True)
         
         super().__init__(

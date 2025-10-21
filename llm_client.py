@@ -20,7 +20,7 @@ class LLMClient:
             )
             self.active = True
         except Exception as e:
-            print(config.get_text("llm_init_error", "Error al inicializar el cliente de OpenAI: {error}").format(error=str(e)))
+            print(config.get_text("llm_init_error", "Error initializing OpenAI client: {error}").format(error=str(e)))
             self.active = False
     
     def update_api_key(self):
@@ -34,7 +34,7 @@ class LLMClient:
             )
             self.active = True
         except Exception as e:
-            print(config.get_text("llm_init_error", "Error al inicializar el cliente de OpenAI: {error}").format(error=str(e)))
+            print(config.get_text("llm_init_error", "Error initializing OpenAI client: {error}").format(error=str(e)))
             self.active = False
     
     # +++ MODIFIED METHOD FOR SCENARIOS +++
@@ -43,7 +43,7 @@ class LLMClient:
         Obtiene una respuesta del LLM para un escenario, pidiéndole que evalúe los conceptos.
         """
         if not self.active or not config.get_effective_api_key():
-            return f"CONCEPTS_COVERED: []\n{config.get_text('llm_not_configured_scenario', 'El cliente LLM no está configurado.')}"
+            return f"CONCEPTS_COVERED: []\n{config.get_text('llm_not_configured_scenario', 'LLM client not configured.')}"
 
         # Convertir el dict de conceptos a un string para el chatbot_message
         concepts_json_str = json.dumps(concepts_to_check, ensure_ascii=False)
@@ -83,8 +83,8 @@ class LLMClient:
             
             return response
         except Exception as e:
-            print(config.get_text("deepseek_api_error", "Error en la llamada a la API de DeepSeek: {error}").format(error=str(e)))
-            return f"CONCEPTS_COVERED: []\n{config.get_text('api_error_scenario', 'Hubo un error al contactar con el servicio de IA.')}"
+            print(config.get_text("deepseek_api_error", "Error in DeepSeek API call: {error}").format(error=str(e)))
+            return f"CONCEPTS_COVERED: []\n{config.get_text('api_error_scenario', 'There was an error contacting the AI service.')}"
 
     def extract_information(self, user_message: str, extract_info: Dict[str, str]):
         """
@@ -134,7 +134,7 @@ class LLMClient:
                 return {}
                 
         except Exception as e:
-            print(config.get_text("deepseek_api_error", "Error en la llamada a la API de DeepSeek: {error}").format(error=str(e)))
+            print(config.get_text("deepseek_api_error", "Error in DeepSeek API call: {error}").format(error=str(e)))
             return {}
 
     def evaluate_goal_completion(self, history: List[Dict[str, str]], current_goal: str, goal_prompt: str = ""):
@@ -184,12 +184,12 @@ class LLMClient:
             
             return response
         except Exception as e:
-            print(config.get_text("deepseek_api_error", "Error en la llamada a la API de DeepSeek: {error}").format(error=str(e)))
-            return f"GOAL_ACHIEVED: false\n{config.get_text('api_error_scenario', 'Hubo un error al contactar con el servicio de IA.')}"
+            print(config.get_text("deepseek_api_error", "Error in DeepSeek API call: {error}").format(error=str(e)))
+            return f"GOAL_ACHIEVED: false\n{config.get_text('api_error_scenario', 'There was an error contacting the AI service.')}"
 
     def get_correction(self, user_answer: str, prompt_question: str):
         if not self.active or not config.get_effective_api_key():
-            return config.get_text("llm_not_configured", "El cliente LLM no está configurado. Por favor, añade tu API key en config.py")
+            return config.get_text("llm_not_configured", "LLM client not configured. Please add your API key in config.py")
 
         system_prompt = config.get_text(
             "correction_system_prompt",
@@ -212,5 +212,5 @@ class LLMClient:
             )
             return chat_completion.choices[0].message.content
         except Exception as e:
-            print(config.get_text("deepseek_api_error", "Error en la llamada a la API de DeepSeek: {error}").format(error=str(e)))
-            return config.get_text("api_error", "Hubo un error al contactar con el servicio de IA.")
+            print(config.get_text("deepseek_api_error", "Error in DeepSeek API call: {error}").format(error=str(e)))
+            return config.get_text("api_error", "There was an error contacting the AI service.")

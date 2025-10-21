@@ -21,7 +21,7 @@ class LessonViewModel:
 
         lesson_content = self.app_state.data_manager.get_lesson_content(self.app_state.lesson_state.current_lesson_id)
         is_last_slide = self.app_state.lesson_state.current_slide_index == len(lesson_content) - 1
-        self.view.next_button.text = config.get_text("finish", "Finalizar") if is_last_slide else config.get_text("next", "Siguiente")
+        self.view.next_button.text = config.get_text("finish", "Finish") if is_last_slide else config.get_text("next", "Next")
         
         if self.app_state.lesson_state.current_slide_index > 0:
             self.view.previous_button.opacity = 1.0
@@ -231,7 +231,7 @@ class LessonViewModel:
                         else:
                             chat_response = "Perfect! Je hebt alle doelen bereikt."
                     else:
-                        retry_msg = config.get_text("goal_not_achieved", "No es del todo correcto. ¡Inténtalo de nuevo!")
+                        retry_msg = config.get_text("goal_not_achieved", "Not quite right. Try again!")
                         chat_response = retry_msg
                         
                 except Exception as err:

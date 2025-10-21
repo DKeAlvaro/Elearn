@@ -1,46 +1,18 @@
 # managers/progress_manager.py
-import json
-import os
+from user_data_manager import user_data_manager
 
 class ProgressManager:
-    def __init__(self, progress_file="progress.json"):
-        self.progress_file = progress_file
-        self.completed_lessons = set()
-        self.interactive_scenario_progress = {}
-        self.lesson_slide_positions = {}
-        self.user_data = {}
-        self.load_progress()
-
-    def load_progress(self):
-        """Carga el progreso desde el archivo."""
-        try:
-            if os.path.exists(self.progress_file):
-                with open(self.progress_file, 'r', encoding='utf-8') as f:
-                    data = json.load(f)
-                    self.completed_lessons = set(data.get('completed_lessons', []))
-                    self.interactive_scenario_progress = data.get('interactive_scenario_progress', {})
-                    self.lesson_slide_positions = data.get('lesson_slide_positions', {})
-                    self.user_data = data.get('user_data', {})
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            print(f"Error loading progress: {e}")
-            self.completed_lessons = set()
-            self.interactive_scenario_progress = {}
-            self.lesson_slide_positions = {}
-            self.user_data = {}
+    def __init__(self):
+        self.completed_lessons = set(user_data_manager.get_progress('completed_lessons', []))
+        self.interactive_scenario_progress = user_data_manager.get_progress('interactive_scenario_progress', {})
+        self.lesson_slide_positions = user_data_manager.get_progress('lesson_slide_positions', {})
+        self.user_data = user_data_manager.get_progress('user_data', {})
 
     def save_progress(self):
-        """Guarda el progreso al archivo."""
-        try:
-            data = {
-                'completed_lessons': list(self.completed_lessons),
-                'interactive_scenario_progress': self.interactive_scenario_progress,
-                'lesson_slide_positions': self.lesson_slide_positions,
-                'user_data': self.user_data
-            }
-            with open(self.progress_file, 'w', encoding='utf-8') as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            print(f"Error saving progress: {e}")
+        user_data_manager.set_progress('completed_lessons', list(self.completed_lessons))
+        user_data_manager.set_progress('interactive_scenario_progress', self.interactive_scenario_progress)
+        user_data_manager.set_progress('lesson_slide_positions', self.lesson_slide_positions)
+        user_data_manager.set_progress('user_data', self.user_data)
 
     def mark_lesson_completed(self, lesson_id: str):
         """Marca una lección como completada."""

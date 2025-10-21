@@ -52,7 +52,7 @@ def HomeView(page: ft.Page, app_state: AppState):
         "/",
         controls=[
             CustomAppBar(
-                title=config.get_text("choose_lesson", "Elige una lección"),
+                title=config.get_text("choose_lesson", "Choose a lesson"),
                 page=page,
                 actions=[
                     ft.IconButton(

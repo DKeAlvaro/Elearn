@@ -2,6 +2,7 @@
 import os
 import json
 from dotenv import load_dotenv
+from user_data_manager import user_data_manager
 
 load_dotenv()
 
@@ -15,9 +16,6 @@ OPENAI_BASE_URL="https://api.openai.com"
 
 BASE_URL = DEEPSEEK_BASE_URL
 MODEL = "deepseek-chat"
-
-# User settings file
-USER_SETTINGS_FILE = "user_settings.json"
 
 # Runtime API key (can be updated by user)
 _runtime_api_key = None
@@ -102,42 +100,17 @@ def get_language_info():
 load_language()
 
 # --- User API Key Management ---
-def load_user_settings():
-    """Load user settings from file"""
-    try:
-        if os.path.exists(USER_SETTINGS_FILE):
-            with open(USER_SETTINGS_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-    except Exception as e:
-        print(f"Error loading user settings: {e}")
-    return {}
-
-def save_user_settings(settings):
-    """Save user settings to file"""
-    try:
-        with open(USER_SETTINGS_FILE, 'w', encoding='utf-8') as f:
-            json.dump(settings, f, ensure_ascii=False, indent=2)
-    except Exception as e:
-        print(f"Error saving user settings: {e}")
-        raise
-
 def get_user_api_key():
     """Get user's saved API key"""
-    settings = load_user_settings()
-    return settings.get('deepseek_api_key')
+    return user_data_manager.get_setting('deepseek_api_key')
 
 def save_user_api_key(api_key):
     """Save user's API key"""
-    settings = load_user_settings()
-    settings['deepseek_api_key'] = api_key
-    save_user_settings(settings)
+    user_data_manager.set_setting('deepseek_api_key', api_key)
 
 def clear_user_api_key():
     """Clear user's saved API key"""
-    settings = load_user_settings()
-    if 'deepseek_api_key' in settings:
-        del settings['deepseek_api_key']
-    save_user_settings(settings)
+    user_data_manager.set_setting('deepseek_api_key', None)
 
 def get_effective_api_key():
     """Get the effective API key (user's key takes precedence over environment)"""
@@ -209,4 +182,3 @@ THEMES = [
         "shadow_color": "#000000"
     }
 ]
-
