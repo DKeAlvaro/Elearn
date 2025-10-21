@@ -1,117 +1,113 @@
-# Architecture of the Language Learning App in Flet
+# Project Structure
 
-IMPORTANT NOTE:
-1. KEEP STRUCTURE FROM structure.md FILE, MODIFY structure.md IN CASE YOU CHANGE SOMETHING
+This document outlines the structure of the language learning application, providing guidance on where to find key components and how to make changes.
 
-This document describes the structure and data flow of the application, and serves as a guide for future updates and improvements.  
-The architecture is designed to be **modular**, **scalable**, and **easy to understand**.
+## High-Level Overview
 
----
+The application is built using the Flet framework for the user interface and a language model (LLM) for AI-powered features. The core of the application is organized into the following directories:
 
-## Architecture Flow
+-   **`views/`**: Contains the different screens of the application.
+-   **`view_models/`**: Handles the logic for the views.
+-   **`data/`**: Manages loading and saving data, including lesson content and user progress.
+-   **`llm/`**: Interacts with the language model API.
+-   **`config/`**: Stores configuration settings.
+-   **`lessons/`**: Contains the lesson content in JSON format.
 
-The application follows a simple design pattern where the **UI is a reflection of the state**, and the data that powers it is **decoupled from the presentation logic**.
+## Key Files and Directories
 
-- **lessons.json**: Single source of truth for all learning content.  
-- **DataManager**: Loads the JSON and provides data to the rest of the app.  
-- **AppState**: State manager that tracks the current lesson, slide, and theme.  
-- **main.py (Router)**: Decides which view to render depending on the route.  
-- **Views (HomeView, LessonView)**: Screen builders, define the layout and UI.  
-- **UIComponents**: Reusable UI components for the application, including slide generators.
-- **LLMClient**: External service that communicates with the DeepSeek API for exercise correction.  
+### `main.py`
 
----
+This is the entry point of the application. It initializes the Flet app, sets up the main page, and handles routing between different views.
 
-## File Descriptions
+### `config.py`
 
-### **main.py**
-- **Purpose**: Entry point of the application.  
-- **Responsibilities**: Initializes Flet, `AppState`, `DataManager`, and `LLMClient`. Manages routing and global theme switching. Displays loading screen with logo and sets app icon.  
+This file contains the application's configuration, including:
 
-### **config.py**
-- **Purpose**: Store configurations and secrets.  
-- **Responsibilities**: Holds the DeepSeek API key, base URL, and theme palettes. Should not be shared if it contains real keys.  
+-   **API Keys**: `DEEPSEEK_API_KEY` and `OPENAI_API_KEY` for the language model.
+-   **Language Settings**: `DEFAULT_LANGUAGE` to set the UI and lesson language.
+-   **Themes**: A list of color schemes for the UI.
 
-### **lessons.json**
-- **Purpose**: Content database.  
-- **Responsibilities**: Defines lessons, their order, and slides. Allows updating content without modifying code.  
+To change the application's language, modify the `DEFAULT_LANGUAGE` variable. For example, to use a Spanish UI with lessons for learning French, set it to `"es-fr"`.
 
-### **data_manager.py**
-- **Purpose**: Abstract data access.  
-- **Responsibilities**: Load `lessons.json` into memory and provide helper functions for accessing lessons and slides.  
+### `data_manager.py`
 
-### **app_state.py**
-- **Purpose**: Manage ephemeral state.  
-- **Responsibilities**: Track current lesson (`current_lesson_id`), current slide index, and active theme. Provides methods like `next_slide()` and `previous_slide()`.
+This class is responsible for loading lesson data from the JSON files in the `lessons/` directory. It provides methods to get all lessons, a specific lesson by ID, and the content of a lesson.
 
-### **llm_client.py**
-- **Purpose**: Encapsulate AI API logic.  
-- **Responsibilities**: Build system prompts, send user responses to DeepSeek, and return formatted corrections.  
+### `app_state.py`
 
-### **ui_components.py**
-- **Purpose**: Reusable UI components for the application.
-- **Responsibilities**: Provides `ChatMessage` and `LoadingMessage` components, and class-based slide generators. Both use the app logo for AI assistant avatars.
+This class manages the global state of the application, including:
 
-### **assets/logo.svg**
-- **Purpose**: Application logo and branding.
-- **Responsibilities**: Used as app icon, loading screen logo, AI assistant avatar, and in all app bar headers throughout the application.  
+-   **Lesson Progress**: Tracks which lessons the user has completed.
+-   **Premium Status**: Determines whether the user has access to premium content.
+-   **Current Theme**: The currently selected UI theme.
 
-### **views/**
-- **home_view.py**: Defines the home screen with a list of lessons. Features logo in the app bar header.  
-- **lesson_view.py**: Defines the lesson screen. Manages its own internal state to update slides without reloading the entire view. Includes logo in the app bar. For interactive scenarios, automatically collects all item_ids from the lesson as required concepts but only requires 3 to be mentioned for completion.
-- **settings_view.py**: Defines the settings screen for API key configuration. Features logo in the app bar header.  
+### `llm_client.py`
 
----
+This class is a client for interacting with the language model API. It provides methods for:
 
-## How to Update the Application
+-   **Getting a scenario response**: Used in interactive conversation scenarios.
+-   **Extracting information**: Extracts specific information from user input.
+-   **Evaluating goal completion**: Determines if the user has completed a learning objective.
+-   **Getting a correction**: Provides feedback on user input.
 
-### Add a New Lesson
-1. Open `lessons.json`.  
-2. Copy an existing lesson object.  
-3. Change the `id`, `title`, and `content`.  
-The app will automatically render it.  
+### `views/`
 
-### Add a New Slide Type
-- Define the structure in `lessons.json`, for example:
+This directory contains the different views of the application. Each view is a Flet `View` object that represents a screen.
 
-```json
-{
-  "type": "multiple_choice",
-  "question": "What does 'Mizu' mean?",
-  "options": ["Water", "Fire", "Earth"],
-  "correct_answer": "Water"
-}
-```
+-   **`home_view.py`**: The main screen, which displays a list of lessons.
+-   **`lesson_view.py`**: The screen where the user interacts with a lesson.
+-   **`settings_view.py`**: The screen where the user can configure their API key.
+-   **`premium_view.py`**: The screen for purchasing premium access.
+-   **`intro_view.py`**: The welcome screen shown on the first run.
 
-## Implementing New Features
+### `view_models/`
 
-### UI Implementation
-- Implement the new slide class in `ui_components.py`.
-- Add the new slide type to the `create_slide_content` factory function in `ui_components.py`.
-- Add interactivity in `lesson_view.py` if required.
+This directory contains the view models, which handle the logic for the views. Each view has a corresponding view model.
 
-### Add a New Theme
-1. Open `config.py`.  
-2. Add a new dictionary to the `THEMES` list.  
-The app will automatically include it in the theme rotation.  
+-   **`home_view_model.py`**: Manages the state of the home view, including the list of lessons.
+-   **`lesson_view_model.py`**: Manages the state of the lesson view, including the current slide and user input.
 
----
+### `ui_components.py`
 
-## TODO List
-### Core Features
-- [ ] Save user progress (using `page.client_storage` or local file).  
-- [ ] Add a progress bar in `LessonView`.  
-- [ ] Add a summary screen at the end of each lesson with scores.  
-- [ ] Implement final open conversation with LLM (with a personality chatbot_message, e.g. "you are a waiter").  
+This file contains reusable UI components, such as chat messages, slide templates, and buttons.
 
-### UI/UX Improvements
-- [x] **Logo Integration**: Added logo as app icon, loading screen, AI assistant avatar, and in all app bar headers.
-- [ ] Add animations with `ft.Animation`.  
-- [ ] Add audio playback button for vocabulary slides.  
-- [ ] Provide visual feedback for correct/incorrect answers.  
-- [ ] Improve phrase-building slides with drag-and-drop interaction.  
+### `managers/`
 
-### Refactoring and Code
-- [ ] Improve error handling in `llm_client`.  
-- [ ] Investigate asynchronous loading for large JSON files.  
-- [ ] Add unit tests for `data_manager` and `app_state`.
+This directory contains managers for different parts of the application.
+
+-   **`progress_manager.py`**: Manages loading and saving user progress.
+-   **`billing_manager.py`**: Manages in-app purchases.
+
+### `state/`
+
+This directory contains classes that manage the state of different parts of the application.
+
+-   **`lesson_state.py`**: Manages the state of the current lesson, including the current slide index.
+-   **`scenario_state.py`**: Manages the state of an interactive scenario.
+
+### `lessons/`
+
+This directory contains the lesson content in JSON format, organized by language. Each language has a subdirectory (e.g., `dutch/`, `spanish/`), which contains the lesson files.
+
+### `generate_lessons/`
+
+This directory contains scripts for generating the lesson files. These scripts use a language model to create lesson content based on a predefined structure.
+
+## How to Make Changes
+
+### Adding a New Language
+
+1.  Add the language to the `lessons/languages.txt` file.
+2.  Run the `generate_lessons/generate_lessons.py` script to create the lesson files.
+3.  Add the language to the `language_folder_map` in `config.py`.
+
+### Modifying a Lesson
+
+To modify a lesson, edit the corresponding JSON file in the `lessons/` directory. The lesson files have a specific structure, so be sure to follow the existing format.
+
+### Adding a New Feature
+
+1.  Create a new view in the `views/` directory.
+2.  Create a corresponding view model in the `view_models/` directory.
+3.  Add a route for the new view in `main.py`.
+4.  Implement the UI and logic for the new feature.

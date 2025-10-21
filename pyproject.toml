@@ -1,5 +1,5 @@
 [project]
-name = "ELearn"
+name = "LLMers"
 version = "1.0.0"
 description = "Educational Learning App"
 dependencies = [
