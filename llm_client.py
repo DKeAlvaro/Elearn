@@ -16,7 +16,7 @@ class LLMClient:
                 raise ImportError("openai package not available")
             self.client = OpenAI(
                 api_key=config.get_effective_api_key(),
-                base_url=config.DEEPSEEK_BASE_URL
+                base_url=config.BASE_URL
             )
             self.active = True
         except Exception as e:
@@ -30,7 +30,7 @@ class LLMClient:
                 raise ImportError("openai package not available")
             self.client = OpenAI(
                 api_key=config.get_effective_api_key(),
-                base_url=config.DEEPSEEK_BASE_URL
+                base_url=config.BASE_URL
             )
             self.active = True
         except Exception as e:
@@ -68,7 +68,7 @@ class LLMClient:
 
         try:
             chat_completion = self.client.chat.completions.create(
-                model="deepseek-chat",
+                model=config.MODEL,
                 messages=messages,
                 max_tokens=150,
                 temperature=0.7
@@ -115,7 +115,7 @@ class LLMClient:
 
         try:
             chat_completion = self.client.chat.completions.create(
-                model="deepseek-chat",
+                model=config.MODEL,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_message}
@@ -147,7 +147,7 @@ class LLMClient:
 
         # Get the target language from configuration
         language_info = config.get_language_info()
-        target_language = language_info["target_language_code"].title()
+        target_language = language_info["target_language_folder"].title()
         
         system_prompt = config.get_text(
             "goal_evaluation_system_prompt",
@@ -169,7 +169,7 @@ class LLMClient:
 
         try:
             chat_completion = self.client.chat.completions.create(
-                model="deepseek-chat",
+                model=config.MODEL,
                 messages=messages,
                 max_tokens=150,
                 temperature=0.7
@@ -203,7 +203,7 @@ class LLMClient:
 
         try:
             chat_completion = self.client.chat.completions.create(
-                model="deepseek-chat",
+                model=config.MODEL,
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_message}

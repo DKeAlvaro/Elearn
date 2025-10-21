@@ -7,7 +7,14 @@ load_dotenv()
 
 # --- Configuración del LLM ---
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+
 DEEPSEEK_BASE_URL = "https://api.deepseek.com"
+OPENAI_BASE_URL="https://api.openai.com"
+
+BASE_URL = DEEPSEEK_BASE_URL
+MODEL = "deepseek-chat"
 
 # User settings file
 USER_SETTINGS_FILE = "user_settings.json"
@@ -18,7 +25,7 @@ _runtime_api_key = None
 # --- Unified Language Configuration ---
 # This single setting controls both UI language and lesson language
 # Format: "ui_language-target_language" (e.g., "en-es" for English UI + English->Spanish lessons)
-DEFAULT_LANGUAGE = "en-es"  # Change this to switch between language combinations
+DEFAULT_LANGUAGE = "en-nl"  # Change this to switch between language combinations
 
 LANGUAGE_DIR = "app_languages"
 
@@ -142,7 +149,7 @@ def get_effective_api_key():
     if user_key:
         return user_key
     
-    return DEEPSEEK_API_KEY
+    return os.getenv("OPENAI_API_KEY")
 
 def update_runtime_api_key(api_key):
     """Update the runtime API key"""
