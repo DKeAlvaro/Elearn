@@ -1,7 +1,7 @@
 # view_models/home_view_model.py
 import flet as ft
-from app_state import AppState
-import config
+import src.config as config
+from src.app_state import AppState
 from dataclasses import dataclass, field
 from typing import Callable, Optional
 

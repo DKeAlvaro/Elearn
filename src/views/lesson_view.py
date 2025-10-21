@@ -1,9 +1,10 @@
 # views/lesson_view.py
 import flet as ft
-from app_state import AppState
-from llm_client import LLMClient
-from ui_components import CustomAppBar
-from view_models.lesson_view_model import LessonViewModel
+import src.config as config
+from src.app_state import AppState
+from src.llm_client import LLMClient
+from src.ui_components import CustomAppBar
+from src.view_models.lesson_view_model import LessonViewModel
 
 class LessonView(ft.View):
     def __init__(self, page: ft.Page, app_state: AppState, llm_client: LLMClient):

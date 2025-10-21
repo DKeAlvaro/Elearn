@@ -1,11 +1,11 @@
 # view_models/lesson_view_model.py
 import flet as ft
-from app_state import AppState
-from llm_client import LLMClient
-import config
+import src.config as config
+from src.app_state import AppState
+from src.llm_client import LLMClient
 import asyncio
-from ui_components import create_slide_content, ChatMessage, LoadingMessage, InteractiveScenarioSlide, LLMCheckSlide
-from utils.typing_simulator import simulate_typing
+from src.ui_components import create_slide_content, ChatMessage, LoadingMessage, InteractiveScenarioSlide, LLMCheckSlide
+from src.utils.typing_simulator import simulate_typing
 
 class LessonViewModel:
     def __init__(self, app_state: AppState, llm_client: LLMClient, page: ft.Page, view: ft.View):

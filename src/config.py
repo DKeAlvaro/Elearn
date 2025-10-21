@@ -2,7 +2,7 @@
 import os
 import json
 from dotenv import load_dotenv
-from user_data_manager import user_data_manager
+from src.user_data_manager import user_data_manager
 
 load_dotenv()
 

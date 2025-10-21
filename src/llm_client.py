@@ -1,5 +1,5 @@
 # llm_client.py
-import config
+import src.config as config
 from typing import List, Dict
 import json
 

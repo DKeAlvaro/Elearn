@@ -1,7 +1,7 @@
 # views/intro_view.py
 import flet as ft
-import config
-from ui_components import AppLogo, Title, Subtitle, PrimaryButton
+import src.config as config
+from src.ui_components import AppLogo, Title, Subtitle, PrimaryButton
 
 def IntroView(page: ft.Page, on_start: callable):
     

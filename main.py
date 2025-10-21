@@ -1,17 +1,17 @@
 # main.py
 
 import flet as ft
-import config
-from data_manager import DataManager
-from app_state import AppState
-from llm_client import LLMClient
-from views.home_view import HomeView
-from views.lesson_view import LessonView
-from views.settings_view import SettingsView
-from views.premium_view import PremiumView
-from views.intro_view import IntroView
-from billing_manager import billing_manager
-from settings_manager import SettingsManager
+import src.config as config
+from src.data_manager import DataManager
+from src.app_state import AppState
+from src.llm_client import LLMClient
+from src.views.home_view import HomeView
+from src.views.lesson_view import LessonView
+from src.views.settings_view import SettingsView
+from src.views.premium_view import PremiumView
+from src.views.intro_view import IntroView
+from src.billing_manager import billing_manager
+from src.settings_manager import SettingsManager
 
 def create_loading_screen():
     return ft.Container(

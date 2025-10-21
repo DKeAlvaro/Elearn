@@ -1,6 +1,6 @@
 # ui_components.py
 import flet as ft
-import config
+import src.config as config
 
 # --- Componentes de Mensajes ---
 

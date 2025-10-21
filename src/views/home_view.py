@@ -1,9 +1,10 @@
 # views/home_view.py
 import flet as ft
-from app_state import AppState
-import config
-from ui_components import CustomAppBar
-from view_models.home_view_model import HomeViewModel
+import src.config as config
+from src.ui_components import CustomAppBar
+from src.view_models.home_view_model import HomeViewModel
+from src.app_state import AppState
+
 
 def HomeView(page: ft.Page, app_state: AppState):
     view_model = HomeViewModel(app_state, page)

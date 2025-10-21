@@ -1,5 +1,6 @@
 # managers/progress_manager.py
-from user_data_manager import user_data_manager
+import src.config as config
+from src.user_data_manager import user_data_manager
 
 class ProgressManager:
     def __init__(self):

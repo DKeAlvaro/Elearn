@@ -1,9 +1,9 @@
 # views/settings_view.py
 import flet as ft
-import config
-from settings_manager import SettingsManager
+import src.config as config
+from src.settings_manager import SettingsManager
 
-from ui_components import CustomAppBar
+from src.ui_components import CustomAppBar
 
 def SettingsView(page: ft.Page, settings_manager: SettingsManager):
     api_key_field = ft.TextField(

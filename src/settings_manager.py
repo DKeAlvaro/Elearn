@@ -1,6 +1,6 @@
 # settings_manager.py
 import flet as ft
-import config
+import src.config as config
 
 class SettingsManager:
     def __init__(self, llm_client, page: ft.Page):

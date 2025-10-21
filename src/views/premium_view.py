@@ -1,9 +1,8 @@
 # views/premium_view.py
 import flet as ft
-from billing_manager import billing_manager
-import config
+import src.billing_manager as billing_manager
+import src.config as config
 
-from ui_components import CustomAppBar
 
 def PremiumView(page: ft.Page):
     """Premium unlock view for in-app purchase"""

@@ -1,8 +1,8 @@
 # data_manager.py
 import json
 import os
-import config
-from user_data_manager import user_data_manager
+import src.config as config
+from src.user_data_manager import user_data_manager
 
 class DataManager:
     def __init__(self):

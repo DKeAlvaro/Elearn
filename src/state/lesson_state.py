@@ -1,5 +1,6 @@
 # state/lesson_state.py
-from data_manager import DataManager
+import src.config as config
+from src.data_manager import DataManager
 
 class LessonState:
     def __init__(self, data_manager: DataManager, progress_manager):
