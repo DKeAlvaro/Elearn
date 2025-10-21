@@ -17,41 +17,45 @@ _runtime_api_key = None
 
 # --- Unified Language Configuration ---
 # This single setting controls both UI language and lesson language
-# Available options: "es-nl" (Spanish UI + Spanish->Dutch lessons) or "en-nl" (English UI + English->Dutch lessons)
-DEFAULT_LANGUAGE = "en-nl"  # Change this to switch between language combinations
+# Format: "ui_language-target_language" (e.g., "en-es" for English UI + English->Spanish lessons)
+DEFAULT_LANGUAGE = "en-es"  # Change this to switch between language combinations
 
 LANGUAGE_DIR = "app_languages"
-
-# Language configuration mapping
-LANGUAGE_CONFIG = {
-    "es-nl": {
-        "name": "Español -> Neerlandés",
-        "ui_language": "es",  # Spanish UI
-        "learning_language": "Español",
-        "target_language": "Neerlandés",
-        "lessons_folder": "lessons/dutch/es-nl"
-    },
-    "en-nl": {
-        "name": "English -> Dutch",
-        "ui_language": "en",  # English UI
-        "learning_language": "English", 
-        "target_language": "Dutch",
-        "lessons_folder": "lessons/dutch/en-nl"
-    }
-}
 
 # Global language strings variable
 _language_strings = {}
 
-def get_current_config():
-    """Get current language configuration"""
-    return LANGUAGE_CONFIG.get(DEFAULT_LANGUAGE, LANGUAGE_CONFIG["es-nl"])
+def get_ui_language():
+    """Extract UI language from DEFAULT_LANGUAGE (part before the dash)"""
+    return DEFAULT_LANGUAGE.split('-')[0]
+
+def get_target_language_folder():
+    """Get target language folder name based on DEFAULT_LANGUAGE"""
+    target_code = DEFAULT_LANGUAGE.split('-')[1]
+    # Map language codes to folder names
+    language_folder_map = {
+        'en': 'english',
+        'fr': 'french',
+        'es': 'spanish',
+        'de': 'german',
+        'ja': 'japanese',
+        'it': 'italian',
+        'ko': 'korean',
+        'zh': 'chinese',
+        'ru': 'russian',
+        'pt': 'portuguese',
+        'ar': 'arabic',
+        'hi': 'hindi',
+        'tr': 'turkish',
+        'nl': 'dutch',
+        'sv': 'swedish'
+    }
+    return language_folder_map.get(target_code, target_code)
 
 def load_language():
     """Load language strings from JSON file based on current configuration"""
     global _language_strings
-    config = get_current_config()
-    ui_language = config["ui_language"]
+    ui_language = get_ui_language()
     
     try:
         language_file = os.path.join(LANGUAGE_DIR, f"{ui_language}.json")
@@ -70,12 +74,22 @@ def get_text(key: str, default: str = "") -> str:
 
 def get_lessons_folder():
     """Get the folder path for lessons based on current language configuration"""
-    config = get_current_config()
-    return config["lessons_folder"]
+    target_folder = get_target_language_folder()
+    return f"lessons/{target_folder}/{DEFAULT_LANGUAGE}"
 
 def get_language_info():
     """Get current language information"""
-    return get_current_config()
+    ui_lang = get_ui_language()
+    target_code = DEFAULT_LANGUAGE.split('-')[1]
+    target_folder = get_target_language_folder()
+    
+    return {
+        "ui_language": ui_lang,
+        "target_language_code": target_code,
+        "target_language_folder": target_folder,
+        "lessons_folder": get_lessons_folder(),
+        "language_combination": DEFAULT_LANGUAGE
+    }
 
 # Initialize with default language
 load_language()

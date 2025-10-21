@@ -98,8 +98,8 @@ class LLMClient:
             return {}
 
         # Get the target language from configuration
-        language_config = config.get_current_config()
-        target_language = language_config["target_language"]
+        language_info = config.get_language_info()
+        target_language = language_info["target_language_code"].title()
 
         # Build extraction instructions
         extraction_instructions = []
@@ -146,8 +146,8 @@ class LLMClient:
             return f"GOAL_ACHIEVED: false\n{config.get_text('llm_not_configured_scenario', 'El cliente LLM no está configurado.')}"
 
         # Get the target language from configuration
-        language_config = config.get_current_config()
-        target_language = language_config["target_language"]
+        language_info = config.get_language_info()
+        target_language = language_info["target_language_code"].title()
         
         system_prompt = config.get_text(
             "goal_evaluation_system_prompt",

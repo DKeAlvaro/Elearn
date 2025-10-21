@@ -1,7 +1,10 @@
 import os
 import json
+import logging
 from dotenv import load_dotenv
 import google.generativeai as genai
+
+logging.getLogger('absl').setLevel(logging.ERROR)
 
 load_dotenv()
 
