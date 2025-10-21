@@ -7,7 +7,6 @@ class DataManager:
     def __init__(self):
         """Initialize DataManager with current language configuration"""
         self.lessons_folder = config.get_lessons_folder()
-        self.lessons_file = os.path.join(self.lessons_folder, "lessons.json")
         self.lessons_data = self.load_lessons()
         self.user_data_file = "user_data.json"
         self.user_data = self.load_user_data()
@@ -37,16 +36,24 @@ class DataManager:
         self.save_user_data()
     
     def load_lessons(self):
-        """Carga las lecciones desde el archivo JSON específico del idioma."""
-        try:
-            with open(self.lessons_file, 'r', encoding='utf-8') as file:
-                return json.load(file)
-        except FileNotFoundError:
-            print(f"Lessons file not found: {self.lessons_file}")
+        """Loads lessons from individual JSON files in the language-specific folder."""
+        lessons = []
+        if not os.path.exists(self.lessons_folder):
+            print(f"Lessons folder not found: {self.lessons_folder}")
             return {"lessons": []}
-        except json.JSONDecodeError as e:
-            print(f"Error decoding JSON from {self.lessons_file}: {e}")
-            return {"lessons": []}
+
+        for filename in os.listdir(self.lessons_folder):
+            if filename.endswith(".json"):
+                file_path = os.path.join(self.lessons_folder, filename)
+                try:
+                    with open(file_path, 'r', encoding='utf-8') as file:
+                        lessons.append(json.load(file))
+                except json.JSONDecodeError as e:
+                    print(f"Error decoding JSON from {file_path}: {e}")
+                except Exception as e:
+                    print(f"Error loading lesson from {file_path}: {e}")
+        
+        return {"lessons": lessons}
     
     def get_lessons(self):
         """Devuelve la lista de lecciones."""
