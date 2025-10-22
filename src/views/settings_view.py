@@ -1,7 +1,7 @@
 # views/settings_view.py
 import flet as ft
 import src.config as config
-from src.settings_manager import SettingsManager
+from src.managers.settings_manager import SettingsManager
 
 from src.ui_components import CustomAppBar
 

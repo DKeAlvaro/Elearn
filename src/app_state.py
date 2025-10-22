@@ -1,6 +1,6 @@
 # app_state.py
 import src.config as config
-from src.data_manager import DataManager
+from src.managers.data_manager import DataManager
 from src.managers.progress_manager import ProgressManager
 from src.state.lesson_state import LessonState
 from src.state.scenario_state import ScenarioState

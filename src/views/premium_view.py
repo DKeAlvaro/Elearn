@@ -1,6 +1,6 @@
 # views/premium_view.py
 import flet as ft
-import src.billing_manager as billing_manager
+import src.managers.billing_manager as billing_manager
 import src.config as config
 
 

@@ -6,7 +6,7 @@ import threading
 import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import requests
-from src.firebase_manager import FirebaseManager
+from src.managers.firebase_manager import FirebaseManager
 from src.app_state import AppState
 
 def LoginView(page: ft.Page, app_state: AppState):
@@ -167,24 +167,37 @@ def LoginView(page: ft.Page, app_state: AppState):
                 user_data = user_response.json()
                 
                 if user_response.status_code == 200:
-                    # Create user object
-                    class GoogleUser:
-                        def __init__(self, user_data):
-                            self.uid = user_data.get('id')
-                            self.email = user_data.get('email')
-                            self.display_name = user_data.get('name')
-                            self.picture = user_data.get('picture')
-                            self.provider = "google.com"
-                    
-                    app_state.user = GoogleUser(user_data)
-                    
-                    status_text.value = f"Welcome {user_data.get('name', 'User')}! Redirecting..."
-                    status_text.color = ft.Colors.GREEN_600
+                    # Create or update user in Firebase Authentication
+                    status_text.value = "Creating user in Firebase..."
+                    status_text.color = ft.Colors.BLUE_600
                     page.update()
                     
-                    # Navigate to home after a short delay
-                    time.sleep(1)
-                    page.go("/")
+                    firebase_user = firebase_manager.create_or_update_user(user_data)
+                    
+                    if firebase_user:
+                        # Create user object with Firebase UID
+                        class GoogleUser:
+                            def __init__(self, user_data, firebase_uid):
+                                self.uid = firebase_uid  # Use Firebase UID
+                                self.email = user_data.get('email')
+                                self.display_name = user_data.get('name')
+                                self.picture = user_data.get('picture')
+                                self.provider = "google.com"
+                                self.firebase_user = firebase_user
+                        
+                        app_state.user = GoogleUser(user_data, firebase_user.uid)
+                        
+                        status_text.value = f"Welcome {user_data.get('name', 'User')}! User created in Firebase. Redirecting..."
+                        status_text.color = ft.Colors.GREEN_600
+                        page.update()
+                        
+                        # Navigate to home after a short delay
+                        time.sleep(2)
+                        page.go("/")
+                    else:
+                        status_text.value = "Failed to create user in Firebase Authentication"
+                        status_text.color = ft.Colors.RED_600
+                        page.update()
                 else:
                     status_text.value = "Failed to get user information from Google"
                     status_text.color = ft.Colors.RED_600

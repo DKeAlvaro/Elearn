@@ -2,7 +2,7 @@
 
 import flet as ft
 import src.config as config
-from src.data_manager import DataManager
+from src.managers.data_manager import DataManager
 from src.app_state import AppState
 from src.llm_client import LLMClient
 from src.views.home_view import HomeView
@@ -11,8 +11,8 @@ from src.views.settings_view import SettingsView
 from src.views.premium_view import PremiumView
 from src.views.intro_view import IntroView
 from src.views.login_view import LoginView
-from src.billing_manager import billing_manager
-from src.settings_manager import SettingsManager
+from src.managers.billing_manager import billing_manager
+from src.managers.settings_manager import SettingsManager
 
 def create_loading_screen():
     return ft.Container(

@@ -62,6 +62,44 @@ class FirebaseManager:
             print(f"Error creating custom token: {e}")
             return None
 
+    def create_or_update_user(self, google_user_data):
+        """Create or update a user in Firebase Authentication using Google OAuth data"""
+        try:
+            email = google_user_data.get('email')
+            google_uid = google_user_data.get('id')
+            name = google_user_data.get('name')
+            picture = google_user_data.get('picture')
+            
+            if not email or not google_uid:
+                raise ValueError("Missing required user data (email or Google UID)")
+            
+            # Try to get existing user by email
+            try:
+                existing_user = auth.get_user_by_email(email)
+                # Update existing user
+                auth.update_user(
+                    existing_user.uid,
+                    display_name=name,
+                    photo_url=picture
+                )
+                print(f"Updated existing user: {email}")
+                return existing_user
+            except auth.UserNotFoundError:
+                # Create new user
+                user_record = auth.create_user(
+                    uid=f"google_{google_uid}",  # Use Google UID with prefix
+                    email=email,
+                    display_name=name,
+                    photo_url=picture,
+                    email_verified=True  # Google emails are pre-verified
+                )
+                print(f"Created new user: {email}")
+                return user_record
+                
+        except Exception as e:
+            print(f"Error creating/updating user: {e}")
+            return None
+
     def get_firebase_config(self):
         """Get Firebase configuration for client-side initialization"""
         return {
