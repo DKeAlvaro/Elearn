@@ -2,10 +2,11 @@
 import flet as ft
 import src.config as config
 from src.managers.settings_manager import SettingsManager
+from src.app_state import AppState
 
 from src.ui_components import CustomAppBar
 
-def SettingsView(page: ft.Page, settings_manager: SettingsManager):
+def SettingsView(page: ft.Page, settings_manager: SettingsManager, app_state: AppState = None):
     api_key_field = ft.TextField(
         label=config.get_text("api_key_label", "DeepSeek API Key"),
         password=True,
@@ -29,6 +30,9 @@ def SettingsView(page: ft.Page, settings_manager: SettingsManager):
     
     def go_back(e):
         page.go("/")
+    
+    def go_to_logout(e):
+        page.go("/logout")
     
     save_button = ft.ElevatedButton(
         text=config.get_text("save", "Save"),
@@ -75,6 +79,61 @@ def SettingsView(page: ft.Page, settings_manager: SettingsManager):
         margin=ft.margin.symmetric(vertical=16)
     )
     
+    # User info and logout section
+    user_info_card = None
+    if app_state and app_state.user:
+        user_name = "User"
+        user_email = ""
+        
+        if hasattr(app_state.user, 'display_name') and app_state.user.display_name:
+            user_name = app_state.user.display_name
+        if hasattr(app_state.user, 'email') and app_state.user.email:
+            user_email = app_state.user.email
+            if not user_name or user_name == "User":
+                user_name = user_email.split('@')[0]
+        
+        user_info_card = ft.Card(
+            content=ft.Container(
+                content=ft.Column([
+                    ft.Row([
+                        ft.Icon(ft.Icons.ACCOUNT_CIRCLE, color=ft.Colors.GREEN, size=24),
+                        ft.Text(
+                            config.get_text("account_info", "Account Information"),
+                            size=16,
+                            weight=ft.FontWeight.BOLD
+                        )
+                    ]),
+                    ft.Container(height=10),
+                    ft.Text(
+                        f"Name: {user_name}",
+                        size=14,
+                        color=ft.Colors.GREY_700
+                    ),
+                    ft.Text(
+                        f"Email: {user_email}",
+                        size=14,
+                        color=ft.Colors.GREY_700
+                    ) if user_email else ft.Container(),
+                    ft.Container(height=15),
+                    ft.FilledButton(
+                        text=config.get_text("logout", "Logout"),
+                        on_click=go_to_logout,
+                        style=ft.ButtonStyle(
+                            bgcolor=ft.Colors.BLUE_600,
+                            color=ft.Colors.WHITE,
+                            shape=ft.RoundedRectangleBorder(radius=12),
+                            padding=ft.padding.symmetric(horizontal=24, vertical=12)
+                        ),
+                        icon=ft.Icons.LOGOUT
+                    )
+                ], spacing=5),
+                padding=20,
+                border_radius=12
+            ),
+            elevation=1,
+            margin=ft.margin.symmetric(vertical=16)
+        )
+    
     return ft.View(
         "/settings",
         controls=[
@@ -88,6 +147,7 @@ def SettingsView(page: ft.Page, settings_manager: SettingsManager):
             ),
             ft.Container(
                 content=ft.Column([
+                    user_info_card if user_info_card else ft.Container(),
                     info_card,
                     ft.Container(
                         content=ft.Column([

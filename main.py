@@ -11,8 +11,10 @@ from src.views.settings_view import SettingsView
 from src.views.premium_view import PremiumView
 from src.views.intro_view import IntroView
 from src.views.login_view import LoginView
+from src.views.logout_view import LogoutView
 from src.managers.billing_manager import billing_manager
 from src.managers.settings_manager import SettingsManager
+from src.utils.network_utils import should_enable_offline_mode
 
 def create_loading_screen():
     return ft.Container(
@@ -66,6 +68,11 @@ def main(page: ft.Page):
     has_premium = billing_manager.check_premium_status()
     app_state.update_premium_status(has_premium)
     
+    # Check network connectivity and enable offline mode if needed
+    if should_enable_offline_mode():
+        app_state.enable_offline_mode()
+        print("Network connectivity issues detected. Enabling offline mode.")
+    
     # Add a small delay to ensure loading screen is visible
     import time
     time.sleep(1)
@@ -81,7 +88,8 @@ def main(page: ft.Page):
     def route_change(route):
         page.views.clear()
 
-        if not app_state.user and page.route not in ["/login", "/intro"]:
+        # Check if user is logged in (including saved sessions)
+        if not app_state.is_user_logged_in() and page.route not in ["/login", "/intro"]:
             page.go("/login")
             return
 
@@ -89,12 +97,14 @@ def main(page: ft.Page):
             page.views.append(LoginView(page, app_state))
         elif page.route == "/intro":
             page.views.append(IntroView(page, on_start_learning))
+        elif page.route == "/logout":
+            page.views.append(LogoutView(page, app_state))
         else:
             page.views.append(HomeView(page, app_state))
             if page.route == "/lesson":
                 page.views.append(LessonView(page, app_state, llm_client))
             elif page.route == "/settings":
-                page.views.append(SettingsView(page, settings_manager))
+                page.views.append(SettingsView(page, settings_manager, app_state))
             elif page.route == "/premium":
                 page.views.append(PremiumView(page))
         page.update()
@@ -109,7 +119,7 @@ def main(page: ft.Page):
 
     if data_manager.is_first_run():
         page.go("/intro")
-    elif not app_state.user:
+    elif not app_state.is_user_logged_in():
         page.go("/login")
     else:
         page.go("/")

@@ -1,6 +1,6 @@
 # views/premium_view.py
 import flet as ft
-import src.managers.billing_manager as billing_manager
+from src.managers.billing_manager import billing_manager
 import src.config as config
 
 
@@ -88,7 +88,7 @@ def PremiumView(page: ft.Page):
         
         # Check if already premium
         if billing_manager.check_premium_status():
-            purchase_status.value = "✅ You already have premium access!"
+            purchase_status.value = "You already have premium access!"
             purchase_status.color = ft.Colors.GREEN
             purchase_button.visible = False
             loading_indicator.visible = False
