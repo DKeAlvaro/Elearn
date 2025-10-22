@@ -14,6 +14,7 @@ class AppState:
         self.scenario_state = ScenarioState()
         self.current_theme_index = 0
         self.has_premium = False
+        self.user = None
 
     def update_premium_status(self, has_premium: bool):
         self.has_premium = has_premium

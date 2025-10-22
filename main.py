@@ -10,6 +10,7 @@ from src.views.lesson_view import LessonView
 from src.views.settings_view import SettingsView
 from src.views.premium_view import PremiumView
 from src.views.intro_view import IntroView
+from src.views.login_view import LoginView
 from src.billing_manager import billing_manager
 from src.settings_manager import SettingsManager
 
@@ -79,7 +80,14 @@ def main(page: ft.Page):
     # --- Enrutamiento ---
     def route_change(route):
         page.views.clear()
-        if page.route == "/intro":
+
+        if not app_state.user and page.route not in ["/login", "/intro"]:
+            page.go("/login")
+            return
+
+        if page.route == "/login":
+            page.views.append(LoginView(page, app_state))
+        elif page.route == "/intro":
             page.views.append(IntroView(page, on_start_learning))
         else:
             page.views.append(HomeView(page, app_state))
@@ -98,11 +106,13 @@ def main(page: ft.Page):
 
     page.on_route_change = route_change
     page.on_view_pop = view_pop
-    
+
     if data_manager.is_first_run():
         page.go("/intro")
+    elif not app_state.user:
+        page.go("/login")
     else:
         page.go("/")
 
 if __name__ == "__main__":
-    ft.app(target=main)
+    ft.app(target=main, assets_dir="assets")
