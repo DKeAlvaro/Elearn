@@ -1,6 +1,9 @@
 # ui_components.py
 import flet as ft
 import src.config as config
+import threading
+import time
+from src.utils.network_utils import check_internet_connection
 
 # --- Componentes de Mensajes ---
 
@@ -295,3 +298,79 @@ def create_slide_content(slide_data: dict) -> ft.Control:
         return slide_class(slide_data)
     else:
         return BaseSlide([ft.Text(f"Tipo de diapositiva desconocido: {slide_type}")])
+
+
+# --- Network Status Component ---
+
+class NetworkStatusComponent:
+    """Component that displays network connectivity status with frequent updates"""
+    
+    def __init__(self, page: ft.Page, update_interval: int = 5):
+        self.page = page
+        self.update_interval = update_interval
+        self.is_online = True
+        self.is_running = False
+        
+        # Create the icon button
+        self.icon_button = ft.IconButton(
+            icon=ft.Icons.WIFI,
+            icon_color=ft.Colors.GREEN,
+            tooltip="Online",
+            disabled=True  # Make it non-clickable, just an indicator
+        )
+        
+        # Start the monitoring thread
+        self.start_monitoring()
+    
+    def start_monitoring(self):
+        """Start the background thread to monitor network status"""
+        if not self.is_running:
+            self.is_running = True
+            self.monitor_thread = threading.Thread(target=self._monitor_network, daemon=True)
+            self.monitor_thread.start()
+    
+    def stop_monitoring(self):
+        """Stop the background monitoring"""
+        self.is_running = False
+    
+    def _monitor_network(self):
+        """Background thread function to check network status periodically"""
+        while self.is_running:
+            try:
+                # Check internet connectivity
+                current_status = check_internet_connection()
+                
+                # Update UI if status changed
+                if current_status != self.is_online:
+                    self.is_online = current_status
+                    self._update_icon()
+                
+                # Wait for the specified interval
+                time.sleep(self.update_interval)
+                
+            except Exception as e:
+                print(f"Error checking network status: {e}")
+                time.sleep(self.update_interval)
+    
+    def _update_icon(self):
+        """Update the icon based on current network status"""
+        try:
+            if self.is_online:
+                self.icon_button.icon = ft.Icons.WIFI
+                self.icon_button.icon_color = ft.Colors.GREEN
+                self.icon_button.tooltip = "Online"
+            else:
+                self.icon_button.icon = ft.Icons.WIFI_OFF
+                self.icon_button.icon_color = ft.Colors.RED
+                self.icon_button.tooltip = "Offline"
+            
+            # Update the page
+            if self.page:
+                self.page.update()
+                
+        except Exception as e:
+            print(f"Error updating network status icon: {e}")
+    
+    def get_component(self):
+        """Return the icon button component"""
+        return self.icon_button

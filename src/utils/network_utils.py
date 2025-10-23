@@ -73,5 +73,6 @@ def should_enable_offline_mode() -> bool:
     """
     internet_available, firebase_available = get_network_status()
     
-    # Enable offline mode if either internet or Firebase is unavailable
-    return not (internet_available and firebase_available)
+    # Enable offline mode only if internet is completely unavailable
+    # Firebase connectivity issues shouldn't trigger offline mode
+    return not internet_available
