@@ -64,5 +64,7 @@ class UserDataManager:
         self.data["app_data"][key] = value
         self._save_data()
 
+
+
 # Global instance
 user_data_manager = UserDataManager()

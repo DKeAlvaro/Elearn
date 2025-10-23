@@ -13,14 +13,27 @@ class SettingsManager:
             status_message.color = ft.Colors.RED
         else:
             try:
-                config.save_user_api_key(api_key)
-                status_message.value = config.get_text("api_key_saved", "API key saved successfully!")
-                status_message.color = ft.Colors.GREEN
-                
-                config.update_runtime_api_key(api_key)
-                
-                if self.llm_client:
-                    self.llm_client.update_api_key()
+                # First validate the API key
+                if self.llm_client and self.llm_client.validate_api_key(api_key):
+                    # API key is valid - save it and use DeepSeek
+                    config.save_user_api_key(api_key)
+                    status_message.value = config.get_text("api_key_saved_deepseek", "API key saved successfully! Using DeepSeek API.")
+                    status_message.color = ft.Colors.GREEN
+                    
+                    config.update_runtime_api_key(api_key)
+                    
+                    if self.llm_client:
+                        self.llm_client.update_api_key()
+                else:
+                    # API key is invalid - still save it but warn user
+                    config.save_user_api_key(api_key)
+                    status_message.value = config.get_text("api_key_saved_fallback", "API key saved but validation failed. Using Gradio fallback.")
+                    status_message.color = ft.Colors.ORANGE
+                    
+                    config.update_runtime_api_key(api_key)
+                    
+                    if self.llm_client:
+                        self.llm_client.update_api_key()
                 
             except Exception as ex:
                 status_message.value = config.get_text("api_key_save_error", "Error saving API key: {error}").format(error=str(ex))
