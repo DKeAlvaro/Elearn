@@ -2,6 +2,7 @@
 
 import flet as ft
 import src.config as config
+import asyncio
 from src.managers.data_manager import DataManager
 from src.app_state import AppState
 from src.llm_client import LLMClient
@@ -33,7 +34,7 @@ def create_loading_screen():
         expand=True
     )
 
-def main(page: ft.Page):
+async def main(page: ft.Page):
     page.title = config.get_text("app_title", "Language Learning App")
     
     page.window_icon = "assets/logo.svg"
@@ -57,7 +58,7 @@ def main(page: ft.Page):
         "Poppins": "https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
     }
     
-    # --- Inicialización ---
+    # --- Initialization ---
     data_manager = DataManager()
     app_state = AppState(data_manager)
     llm_client = LLMClient()
@@ -72,8 +73,7 @@ def main(page: ft.Page):
         print("Network connectivity issues detected. Enabling offline mode.")
     
     # Add a small delay to ensure loading screen is visible
-    import time
-    time.sleep(1)
+    await asyncio.sleep(1)
     
     # Remove loading screen after initialization
     page.clean()
@@ -82,20 +82,28 @@ def main(page: ft.Page):
         data_manager.set_first_run_completed()
         page.go("/")
 
-    # --- Enrutamiento ---
+    # --- Routing ---
     def route_change(route):
         page.views.clear()
 
         if page.route == "/intro":
             page.views.append(IntroView(page, on_start_learning))
-        else:
-            page.views.append(HomeView(page, app_state, llm_client))
-            if page.route == "/lesson":
-                page.views.append(LessonView(page, app_state, llm_client))
-            elif page.route == "/settings":
-                page.views.append(SettingsView(page, settings_manager, app_state))
-            elif page.route == "/premium":
-                page.views.append(PremiumView(page))
+            page.update()
+            return
+
+        # Base view for the main app
+        page.views.append(HomeView(page, app_state, llm_client))
+
+        # Add other views on top based on the route
+        route_map = {
+            "/lesson": LessonView(page, app_state, llm_client),
+            "/settings": SettingsView(page, settings_manager, app_state),
+            "/premium": PremiumView(page),
+        }
+
+        if page.route in route_map:
+            page.views.append(route_map[page.route])
+
         page.update()
 
     def view_pop(view):

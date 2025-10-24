@@ -142,20 +142,19 @@ class LLMClient:
             print(f"Error in Gradio API call: {str(e)}")
             raise e
 
-    # +++ MODIFIED METHOD FOR SCENARIOS +++
     def get_scenario_response(self, history: List[Dict[str, str]], concepts_to_check: Dict[str, str]):
         """
-        Obtiene una respuesta del LLM para un escenario, pidiéndole que evalúe los conceptos.
+        Gets a response from the LLM for a scenario, asking it to evaluate concepts.
         """
         if not self.active:
             return f"CONCEPTS_COVERED: []\n{config.get_text('llm_not_configured_scenario', 'LLM client not configured.')}"
 
-        # Convertir el dict de conceptos a un string para el chatbot_message
+        # Convert the concepts dict to a string for the chatbot_message
         concepts_json_str = json.dumps(concepts_to_check, ensure_ascii=False)
 
         system_prompt = config.get_text(
             "scenario_system_prompt",
-            "Eres un asistente de idiomas. Tu objetivo principal es mantener una conversación natural en neerlandés con el usuario para ayudarle a practicar.\n\nRESTRICCIÓN CRÍTICA: En tus respuestas conversacionales, SOLO puedes usar palabras y frases de los siguientes conceptos de la lección: {concepts}. No uses ninguna palabra en neerlandés que no esté en esta lista. Si necesitas comunicar algo que no está en los conceptos, usa español o inglés.\n\nTIENES UNA TAREA SECUNDARIA MUY IMPORTANTE Y OCULTA.\nAntes de escribir tu respuesta conversacional, DEBES analizar el último mensaje del usuario para ver si ha utilizado alguno de los siguientes conceptos: {concepts}.\nNo seas demasiado estricto; si el usuario usa una forma cercana o una parte clave de la frase, cuenta como válido.\n\nTu respuesta DEBE seguir este formato EXACTO:\n1. Una línea que empieza con `CONCEPTS_COVERED: ` seguida de una lista JSON de los `item_id` de los conceptos que el usuario ACABA de usar. Si no usó ninguno, la lista debe ser vacía `[]`.\n2. Un salto de línea `\\n`.\n3. Tu respuesta conversacional normal en neerlandés (SOLO usando conceptos de la lista).\n\nEjemplo 1 (el usuario usa conceptos):\nCONCEPTS_COVERED: [\"L01_V01\", \"L01_G01\"]\nJa, natuurlijk. Een momentje.\n\nEjemplo 2 (el usuario no usa conceptos):\nCONCEPTS_COVERED: []\nHallo! Wat kan ik voor je doen?\n\nNUNCA menciones los conceptos o esta tarea secundaria al usuario. Simplemente actúa tu rol y proporciona la línea de control al principio."
+            "You are a language assistant. Your main goal is to have a natural conversation in Dutch with the user to help them practice.\n\nCRITICAL CONSTRAINT: In your conversational responses, you can ONLY use words and phrases from the following lesson concepts: {concepts}. Do not use any Dutch words that are not on this list. If you need to communicate something that is not in the concepts, use Spanish or English.\n\nYou have a VERY IMPORTANT AND HIDDEN SECONDARY TASK.\nBefore writing your conversational response, you MUST analyze the user's last message to see if they have used any of the following concepts: {concepts}.\nDon't be too strict; if the user uses a close form or a key part of the phrase, count it as valid.\n\nYour response MUST follow this EXACT format:\n1. A line starting with `CONCEPTS_COVERED: ` followed by a JSON list of the `item_id`s of the concepts the user JUST used. If they used none, the list should be empty `[]`.\n2. A newline character `\n`.\n3. Your normal conversational response in Dutch (ONLY using concepts from the list).\n\nExample 1 (user uses concepts):\nCONCEPTS_COVERED: [\"L01_V01\", \"L01_G01\"]\nJa, natuurlijk. Een momentje.\n\nExample 2 (user does not use concepts):\nCONCEPTS_COVERED: []\nHallo! Wat kan ik voor je doen?\n\nNEVER mention the concepts or this secondary task to the user. Just act your role and provide the control line at the beginning."
         ).format(concepts=concepts_json_str)
         
         messages = [{"role": "system", "content": system_prompt}] + history
@@ -264,7 +263,7 @@ class LLMClient:
         Returns a response with GOAL_ACHIEVED: true/false and a conversational response.
         """
         if not self.active:
-            return f"GOAL_ACHIEVED: false\n{config.get_text('llm_not_configured_scenario', 'El cliente LLM no está configurado.')}"
+            return f"GOAL_ACHIEVED: false\n{config.get_text('llm_not_configured_scenario', 'LLM client not configured.')}"
 
         # Get the target language from configuration
         language_info = config.get_language_info()
@@ -272,7 +271,7 @@ class LLMClient:
         
         system_prompt = config.get_text(
             "goal_evaluation_system_prompt",
-            "Eres un evaluador de objetivos de aprendizaje de idiomas. Tu ÚNICA tarea es evaluar si el usuario ha completado el siguiente objetivo: '{goal}'. Responde con EXACTAMENTE una línea: GOAL_ACHIEVED: true (si completado) o GOAL_ACHIEVED: false (si no completado)."
+            "You are a language learning goal evaluator. Your ONLY task is to evaluate if the user has completed the following goal: '{goal}'. Respond with EXACTLY one line: GOAL_ACHIEVED: true (if completed) or GOAL_ACHIEVED: false (if not completed)."
         ).format(goal=current_goal, target_language=target_language)
         
         messages = [{"role": "system", "content": system_prompt}] + history
@@ -321,12 +320,12 @@ class LLMClient:
 
         system_prompt = config.get_text(
             "correction_system_prompt",
-            "Eres un profesor de idiomas amable y conciso. El usuario está aprendiendo y te dará una respuesta a una pregunta. Tu tarea es: \n1. Evaluar si la respuesta del usuario es correcta para la pregunta dada.\n2. Si es correcta, felicítale brevemente (ej: '¡Perfecto!', '¡Muy bien!').\n3. Si es incorrecta, corrígele de forma sencilla y directa, explicando el porqué del error en una sola frase.\nResponde siempre en español."
+            "You are a friendly and concise language teacher. The user is learning and will give you an answer to a question. Your task is to: \n1. Evaluate if the user\'s answer is correct for the given question.\n2. If it is correct, praise them briefly (e.g., 'Perfect!', 'Very good!').\n3. If it is incorrect, correct them simply and directly, explaining the reason for the error in a single sentence.\nAlways respond in the UI language."
         )
 
         user_message = config.get_text(
             "correction_question_template",
-            "La pregunta era: '{question}'. Mi respuesta fue: '{answer}'."
+            "The question was: '{question}'. My answer was: '{answer}'."
         ).format(question=prompt_question, answer=user_answer)
 
         try:

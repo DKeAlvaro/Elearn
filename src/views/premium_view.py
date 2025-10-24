@@ -2,6 +2,7 @@
 import flet as ft
 from src.managers.billing_manager import billing_manager
 import src.config as config
+from src.ui_components import CustomAppBar
 
 
 def PremiumView(page: ft.Page):

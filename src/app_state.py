@@ -6,7 +6,7 @@ from src.state.lesson_state import LessonState
 from src.state.scenario_state import ScenarioState
 
 class AppState:
-    """Gestiona el estado global de la aplicación."""
+    """Manages the global state of the application."""
     def __init__(self, data_manager: DataManager):
         self.data_manager = data_manager
         self.progress_manager = ProgressManager()
