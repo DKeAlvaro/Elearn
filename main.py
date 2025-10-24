@@ -9,10 +9,8 @@ from src.llm_client import LLMClient
 from src.views.home_view import HomeView
 from src.views.lesson_view import LessonView
 from src.views.settings_view import SettingsView
-from src.views.premium_view import PremiumView
 from src.views.intro_view import IntroView
 
-from src.managers.billing_manager import billing_manager
 from src.managers.settings_manager import SettingsManager
 from src.utils.network_utils import should_enable_offline_mode
 
@@ -64,10 +62,6 @@ async def main(page: ft.Page):
     llm_client = LLMClient()
     settings_manager = SettingsManager(llm_client, page)
     
-    # Check premium status and update app_state
-    has_premium = billing_manager.check_premium_status()
-    app_state.update_premium_status(has_premium)
-    
     # Check network connectivity and enable offline mode if needed
     if should_enable_offline_mode():
         print("Network connectivity issues detected. Enabling offline mode.")
@@ -98,7 +92,6 @@ async def main(page: ft.Page):
         route_map = {
             "/lesson": LessonView(page, app_state, llm_client),
             "/settings": SettingsView(page, settings_manager, app_state),
-            "/premium": PremiumView(page),
         }
 
         if page.route in route_map:

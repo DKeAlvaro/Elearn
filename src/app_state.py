@@ -13,13 +13,9 @@ class AppState:
         self.lesson_state = LessonState(data_manager, self.progress_manager)
         self.scenario_state = ScenarioState()
         self.current_theme_index = 0
-        self.has_premium = False
-
-    def update_premium_status(self, has_premium: bool):
-        self.has_premium = has_premium
 
     def is_lesson_unlocked(self, lesson_id: str) -> bool:
-        """Verifica si una lección está desbloqueada, considerando el estado premium."""
+        """Verifies if a lesson is unlocked."""
         lessons = self.data_manager.get_lessons()
         
         current_lesson_index = -1
@@ -34,53 +30,14 @@ class AppState:
         if current_lesson_index == 0:
             return True
         
-        lesson_number = current_lesson_index + 1
-        if not self.has_premium and lesson_number % 4 == 0:
-            return False
-        
-        for i in range(current_lesson_index - 1, -1, -1):
-            previous_lesson = lessons[i]
-            previous_lesson_number = i + 1
-            previous_lesson_id = previous_lesson.get("id")
-            
-            if not self.has_premium and previous_lesson_number % 4 == 0:
-                continue
-            
-            return self.progress_manager.is_lesson_completed(previous_lesson_id)
-        
-        return True
+        # Check if the previous lesson is completed
+        previous_lesson = lessons[current_lesson_index - 1]
+        previous_lesson_id = previous_lesson.get("id")
+        return self.progress_manager.is_lesson_completed(previous_lesson_id)
 
     def get_lesson_lock_reason(self, lesson_id: str) -> str:
-        """Returns the reason why a lesson is locked: 'unlocked', 'premium', or 'progression'."""
-        lessons = self.data_manager.get_lessons()
-        
-        current_lesson_index = -1
-        for i, lesson in enumerate(lessons):
-            if lesson.get("id") == lesson_id:
-                current_lesson_index = i
-                break
-        
-        if current_lesson_index == -1:
-            return "progression"
-        
-        lesson_number = current_lesson_index + 1
-        if not self.has_premium and lesson_number % 4 == 0:
-            return "premium"
-        
-        for i in range(current_lesson_index - 1, -1, -1):
-            previous_lesson = lessons[i]
-            previous_lesson_number = i + 1
-            previous_lesson_id = previous_lesson.get("id")
-            
-            if not self.has_premium and previous_lesson_number % 4 == 0:
-                continue
-            
-            if self.progress_manager.is_lesson_completed(previous_lesson_id):
-                return "unlocked"
-            else:
-                return "progression"
-        
-        if current_lesson_index == 0:
+        """Returns the reason why a lesson is locked: 'unlocked' or 'progression'."""
+        if self.is_lesson_unlocked(lesson_id):
             return "unlocked"
-        
-        return "unlocked"
+        else:
+            return "progression"
