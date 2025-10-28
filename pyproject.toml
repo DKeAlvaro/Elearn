@@ -6,7 +6,8 @@ dependencies = [
     "flet>=0.27.1",
     "requests",
     "python-dotenv",
-    "openai"
+    "openai",
+    "gradio_client"
 ]
 
 [tool.flet.android]
@@ -16,6 +17,8 @@ dependencies = [
 
 [tool.flet.android.permissions]
 "com.android.vending.BILLING" = true
+"android.permission.INTERNET" = true
+"android.permission.ACCESS_NETWORK_STATE" = true
 
 [build-system]
 requires = ["setuptools>=45", "wheel"]

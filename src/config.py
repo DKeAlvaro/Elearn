@@ -105,8 +105,32 @@ def clear_user_api_key():
     """Clear user's saved API key"""
     user_data_manager.set_setting('deepseek_api_key', None)
 
+# This will hold the API key provided by the user at runtime
+_runtime_api_key = None
+
+def update_runtime_api_key(api_key: str):
+    """Update the API key at runtime."""
+    global _runtime_api_key
+    _runtime_api_key = api_key
+
+def get_user_api_key():
+    """Get user's saved API key"""
+    return user_data_manager.get_setting('deepseek_api_key')
+
+def save_user_api_key(api_key):
+    """Save user's API key"""
+    user_data_manager.set_setting('deepseek_api_key', api_key)
+
+def clear_user_api_key():
+    """Clear user's saved API key"""
+    user_data_manager.set_setting('deepseek_api_key', None)
+
 def get_effective_api_key():
     """Get the effective API key, prioritizing the user's saved key over environment variables."""
+    # Highest priority: runtime key
+    if _runtime_api_key:
+        return _runtime_api_key
+    
     user_key = get_user_api_key()
     if user_key:
         return user_key

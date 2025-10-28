@@ -24,8 +24,7 @@ def create_api_status_indicator(llm_client):
             border_radius=16,
             margin=ft.margin.symmetric(horizontal=16, vertical=8)
         )
-    elif hasattr(llm_client, 'gradio_client') and llm_client.gradio_client:
-        # Gradio fallback is active
+    elif getattr(llm_client, 'active', False) and not getattr(llm_client, 'using_deepseek', False):
         return ft.Container(
             content=ft.Row([
                 ft.Icon(ft.Icons.WARNING, color=ft.Colors.ORANGE, size=16),

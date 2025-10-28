@@ -7,7 +7,9 @@ import openai
 # Safely import Gradio client to avoid crashing if the package isn't available
 try:
     from gradio_client import Client
-except Exception:
+    print("Successfully imported gradio_client")
+except Exception as e:
+    print(f"Failed to import gradio_client: {e}")
     Client = None
 
 class LLMClient:
@@ -139,7 +141,7 @@ class LLMClient:
             )
             return result
         except Exception as e:
-            print(f"Error in Gradio API call: {str(e)}")
+            # Let the calling method handle error logging to avoid duplicates
             raise e
 
     def get_scenario_response(self, history: List[Dict[str, str]], concepts_to_check: Dict[str, str]):
@@ -312,7 +314,8 @@ class LLMClient:
         except Exception as e:
             error_type = "deepseek_api_error" if self.using_deepseek else "gradio_api_error"
             print(config.get_text(error_type, "Error in API call: {error}").format(error=str(e)))
-            return f"GOAL_ACHIEVED: false\n{config.get_text('api_error_scenario', 'There was an error contacting the AI service.')}"
+            original_error = str(e)
+            return f"GOAL_ACHIEVED: false\n{original_error}\n\nUse your own API key to avoid connection issues!"
 
     def get_correction(self, user_answer: str, prompt_question: str):
         if not self.active:

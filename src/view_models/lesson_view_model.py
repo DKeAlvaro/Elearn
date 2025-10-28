@@ -230,9 +230,20 @@ class LessonViewModel:
                                 chat_response = "Goed gedaan! Laten we doorgaan."
                         else:
                             chat_response = "Perfect! Je hebt alle doelen bereikt."
+                    elif "GOAL_ACHIEVED: false" in full_response:
+                        # Check if this is an API error (contains error message after GOAL_ACHIEVED: false)
+                        lines = full_response.split('\n')
+                        if len(lines) > 1 and lines[1].strip():
+                            # There's an error message after GOAL_ACHIEVED: false, display it
+                            error_message = '\n'.join(lines[1:]).strip()
+                            chat_response = f"Error: {error_message}"
+                        else:
+                            # Regular goal not achieved, show retry message
+                            retry_msg = config.get_text("goal_not_achieved", "Not quite right. Try again!")
+                            chat_response = retry_msg
                     else:
-                        retry_msg = config.get_text("goal_not_achieved", "Not quite right. Try again!")
-                        chat_response = retry_msg
+                        # Unexpected response format, display it as an error
+                        chat_response = f"Error: {full_response}"
                         
                 except Exception as err:
                     print(f"Error processing LLM response: {err}")
