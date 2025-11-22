@@ -39,8 +39,26 @@ class DataManager:
         return {"lessons": lessons}
     
     def get_lessons(self):
-        """Devuelve la lista de lecciones."""
-        return self.lessons_data.get('lessons', [])
+        """Devuelve la lista de lecciones ordenadas por ID de lección."""
+        lessons = self.lessons_data.get('lessons', [])
+        return self._sort_lessons_by_id(lessons)
+    
+    def _sort_lessons_by_id(self, lessons):
+        """Ordena las lecciones por su ID de lección."""
+        def get_lesson_sort_key(lesson):
+            lesson_id = lesson.get('id', '')
+            
+            # Try to extract number from lesson ID (e.g., "L1" -> 1, "L2" -> 2)
+            import re
+            match = re.search(r'(\d+)', lesson_id)
+            if match:
+                return int(match.group(1))
+            
+            # Fallback: try to extract from filename if available
+            # This would require storing filename info, but for now we'll use a default
+            return float('inf')  # Put lessons without numeric IDs at the end
+        
+        return sorted(lessons, key=get_lesson_sort_key)
     
     def get_lesson_by_id(self, lesson_id: str):
         """Devuelve una lección específica por su ID."""

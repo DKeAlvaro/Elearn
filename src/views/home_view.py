@@ -6,51 +6,6 @@ from src.view_models.home_view_model import HomeViewModel
 from src.app_state import AppState
 
 
-def create_api_status_indicator(llm_client):
-    """Create a visual indicator for API status"""
-    if not llm_client:
-        return ft.Container()
-    
-    if llm_client.is_deepseek_active():
-        # DeepSeek is active
-        return ft.Container(
-            content=ft.Row([
-                ft.Icon(ft.Icons.CHECK_CIRCLE, color=ft.Colors.GREEN, size=16),
-                ft.Text("DeepSeek API Active", size=12, color=ft.Colors.GREEN, weight=ft.FontWeight.W_500)
-            ], spacing=8, alignment=ft.MainAxisAlignment.CENTER),
-            padding=ft.padding.symmetric(horizontal=12, vertical=6),
-            bgcolor=ft.Colors.GREEN_50,
-            border=ft.border.all(1, ft.Colors.GREEN_200),
-            border_radius=16,
-            margin=ft.margin.symmetric(horizontal=16, vertical=8)
-        )
-    elif getattr(llm_client, 'active', False) and not getattr(llm_client, 'using_deepseek', False):
-        return ft.Container(
-            content=ft.Row([
-                ft.Icon(ft.Icons.WARNING, color=ft.Colors.ORANGE, size=16),
-                ft.Text("Using Gradio Fallback", size=12, color=ft.Colors.ORANGE, weight=ft.FontWeight.W_500)
-            ], spacing=8, alignment=ft.MainAxisAlignment.CENTER),
-            padding=ft.padding.symmetric(horizontal=12, vertical=6),
-            bgcolor=ft.Colors.ORANGE_50,
-            border=ft.border.all(1, ft.Colors.ORANGE_200),
-            border_radius=16,
-            margin=ft.margin.symmetric(horizontal=16, vertical=8)
-        )
-    else:
-        # No API available
-        return ft.Container(
-            content=ft.Row([
-                ft.Icon(ft.Icons.ERROR, color=ft.Colors.RED, size=16),
-                ft.Text("No API Available", size=12, color=ft.Colors.RED, weight=ft.FontWeight.W_500)
-            ], spacing=8, alignment=ft.MainAxisAlignment.CENTER),
-            padding=ft.padding.symmetric(horizontal=12, vertical=6),
-            bgcolor=ft.Colors.RED_50,
-            border=ft.border.all(1, ft.Colors.RED_200),
-            border_radius=16,
-            margin=ft.margin.symmetric(horizontal=16, vertical=8)
-        )
-
-
 def HomeView(page: ft.Page, app_state: AppState, llm_client=None):
     view_model = HomeViewModel(app_state, page)
 
@@ -94,9 +49,6 @@ def HomeView(page: ft.Page, app_state: AppState, llm_client=None):
         )
         lesson_cards.append(lesson_card)
 
-    # Create API status indicator
-    api_status_indicator = create_api_status_indicator(llm_client) if llm_client else ft.Container()
-
     return ft.View(
         "/",
         controls=[
@@ -111,7 +63,6 @@ def HomeView(page: ft.Page, app_state: AppState, llm_client=None):
                     )
                 ]
             ),
-            api_status_indicator,
             ft.Container(
                 content=ft.Column(
                     controls=lesson_cards,

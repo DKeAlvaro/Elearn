@@ -6,6 +6,60 @@ from src.app_state import AppState
 
 from src.ui_components import CustomAppBar
 
+def create_api_status_indicator(llm_client):
+    """Create a visual indicator for API status"""
+    if not llm_client:
+        return ft.Container()
+
+    status_map = {
+        "active": {
+            "icon": ft.Icons.CHECK_CIRCLE,
+            "text": "DeepSeek API Active",
+            "color": ft.Colors.GREEN,
+            "bgcolor": ft.Colors.GREEN_50,
+            "border_color": ft.Colors.GREEN_200,
+        },
+        "fallback": {
+            "icon": ft.Icons.WARNING,
+            "text": "Using Gradio Fallback",
+            "color": ft.Colors.ORANGE,
+            "bgcolor": ft.Colors.ORANGE_50,
+            "border_color": ft.Colors.ORANGE_200,
+        },
+        "inactive": {
+            "icon": ft.Icons.ERROR,
+            "text": "No API Available",
+            "color": ft.Colors.RED,
+            "bgcolor": ft.Colors.RED_50,
+            "border_color": ft.Colors.RED_200,
+        },
+    }
+
+    if llm_client.is_deepseek_active():
+        status = "active"
+    elif getattr(llm_client, 'active', False) and not getattr(llm_client, 'using_deepseek', False):
+        status = "fallback"
+    else:
+        status = "inactive"
+
+    config = status_map[status]
+
+    return ft.Container(
+        content=ft.Row(
+            [
+                ft.Icon(config["icon"], color=config["color"], size=16),
+                ft.Text(config["text"], size=12, color=config["color"], weight=ft.FontWeight.W_500),
+            ],
+            spacing=8,
+            alignment=ft.MainAxisAlignment.CENTER,
+        ),
+        padding=ft.padding.symmetric(horizontal=12, vertical=6),
+        bgcolor=config["bgcolor"],
+        border=ft.border.all(1, config["border_color"]),
+        border_radius=16,
+        margin=ft.margin.symmetric(horizontal=16, vertical=8),
+    )
+
 def SettingsView(page: ft.Page, settings_manager: SettingsManager, app_state: AppState = None):
     api_key_field = ft.TextField(
         label=config.get_text("api_key_label", "DeepSeek API Key"),
@@ -78,6 +132,7 @@ def SettingsView(page: ft.Page, settings_manager: SettingsManager, app_state: Ap
         margin=ft.margin.symmetric(vertical=16)
     )
     
+    api_status_indicator = create_api_status_indicator(settings_manager.llm_client)
 
     
     return ft.View(
@@ -91,6 +146,7 @@ def SettingsView(page: ft.Page, settings_manager: SettingsManager, app_state: Ap
                     on_click=go_back
                 )
             ),
+            api_status_indicator,
             ft.Container(
                 content=ft.Column([
                     info_card,
