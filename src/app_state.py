@@ -14,6 +14,10 @@ class AppState:
         self.scenario_state = ScenarioState()
         self.current_theme_index = 0
 
+    def reload_lessons(self):
+        """Reloads the lessons in the data manager."""
+        self.data_manager.reload_lessons()
+
     def is_lesson_unlocked(self, lesson_id: str) -> bool:
         """Verifies if a lesson is unlocked."""
         lessons = self.data_manager.get_lessons()

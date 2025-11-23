@@ -17,6 +17,11 @@ class DataManager:
     def set_first_run_completed(self):
         """Marks the first run as completed."""
         user_data_manager.set_app_data("first_run", False)
+
+    def reload_lessons(self):
+        """Reloads the lessons from the disk."""
+        self.lessons_folder = config.get_lessons_folder()
+        self.lessons_data = self.load_lessons()
     
     def load_lessons(self):
         """Loads lessons from individual JSON files in the language-specific folder."""

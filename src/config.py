@@ -16,7 +16,20 @@ MODEL = "deepseek-chat"
 # --- Unified Language Configuration ---
 # This single setting controls both UI language and lesson language
 # Format: "ui_language-target_language" (e.g., "en-es" for English UI + English->Spanish lessons)
-DEFAULT_LANGUAGE = "en-nl"  # Change this to switch between language combinations
+_default_language = "en-nl"
+
+def get_default_language():
+    """
+    Gets the default language, prioritizing the user's saved selection.
+    """
+    saved_language = user_data_manager.get_setting("selected_language")
+    if saved_language:
+        return saved_language
+    return _default_language
+
+def set_default_language(language):
+    global _default_language
+    _default_language = language
 
 LANGUAGE_DIR = "app_languages"
 
@@ -25,11 +38,11 @@ _language_strings = {}
 
 def get_ui_language():
     """Extract UI language from DEFAULT_LANGUAGE (part before the dash)"""
-    return DEFAULT_LANGUAGE.split('-')[0]
+    return get_default_language().split('-')[0]
 
 def get_target_language_folder():
     """Get target language folder name based on DEFAULT_LANGUAGE"""
-    target_code = DEFAULT_LANGUAGE.split('-')[1]
+    target_code = get_default_language().split('-')[1]
     # Map language codes to folder names
     language_folder_map = {
         'en': 'english',
@@ -73,12 +86,12 @@ def get_text(key: str, default: str = "") -> str:
 def get_lessons_folder():
     """Get the folder path for lessons based on current language configuration"""
     target_folder = get_target_language_folder()
-    return f"lessons/{target_folder}/{DEFAULT_LANGUAGE}"
+    return f"lessons/{target_folder}/{get_default_language()}"
 
 def get_language_info():
     """Get current language information"""
     ui_lang = get_ui_language()
-    target_code = DEFAULT_LANGUAGE.split('-')[1]
+    target_code = get_default_language().split('-')[1]
     target_folder = get_target_language_folder()
     
     return {
@@ -86,7 +99,7 @@ def get_language_info():
         "target_language_code": target_code,
         "target_language_folder": target_folder,
         "lessons_folder": get_lessons_folder(),
-        "language_combination": DEFAULT_LANGUAGE
+        "language_combination": get_default_language()
     }
 
 # Initialize with default language

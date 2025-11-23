@@ -1,5 +1,3 @@
-# main.py
-
 import flet as ft
 import src.config as config
 import asyncio
@@ -9,7 +7,8 @@ from src.llm_client import LLMClient
 from src.views.home_view import HomeView
 from src.views.lesson_view import LessonView
 from src.views.settings_view import SettingsView
-from src.views.intro_view import IntroView
+from src.views.language_selection_view import LanguageSelectionView
+from src.managers.user_data_manager import user_data_manager
 
 from src.managers.settings_manager import SettingsManager
 from src.utils.network_utils import should_enable_offline_mode
@@ -57,11 +56,17 @@ async def main(page: ft.Page):
     }
     
     # --- Initialization ---
-    data_manager = DataManager()
-    app_state = AppState(data_manager)
     llm_client = LLMClient()
     settings_manager = SettingsManager(llm_client, page)
     
+    data_manager = None
+    app_state = None
+
+    def initialize_app_state_and_managers():
+        nonlocal app_state, data_manager
+        data_manager = DataManager()
+        app_state = AppState(data_manager)
+
     # Check network connectivity and enable offline mode if needed
     if should_enable_offline_mode():
         print("Network connectivity issues detected. Enabling offline mode.")
@@ -72,18 +77,23 @@ async def main(page: ft.Page):
     # Remove loading screen after initialization
     page.clean()
 
-    def on_start_learning():
-        data_manager.set_first_run_completed()
+    def on_language_selection_complete():
+        initialize_app_state_and_managers()
+        user_data_manager.set_app_data("first_run", False)
         page.go("/")
 
     # --- Routing ---
     def route_change(route):
         page.views.clear()
 
-        if page.route == "/intro":
-            page.views.append(IntroView(page, on_start_learning))
+        if page.route == "/language_selection":
+            page.views.append(LanguageSelectionView(page, on_language_selection_complete))
             page.update()
             return
+
+        # This should only happen on subsequent runs
+        if not app_state:
+            initialize_app_state_and_managers()
 
         # Base view for the main app
         page.views.append(HomeView(page, app_state, llm_client))
@@ -107,9 +117,10 @@ async def main(page: ft.Page):
     page.on_route_change = route_change
     page.on_view_pop = view_pop
 
-    if data_manager.is_first_run():
-        page.go("/intro")
+    if user_data_manager.get_app_data("first_run", True):
+        page.go("/language_selection")
     else:
+        initialize_app_state_and_managers()
         page.go("/")
 
 if __name__ == "__main__":

@@ -137,11 +137,11 @@ class LessonViewModel:
                 current_goal = scenario_state.scenario_user_goals[scenario_state.scenario_current_goal_index]
                 goal_prompt = current_goal.get("chatbot_message", "")
                 if goal_prompt:
-                    try:
-                        all_variables = scenario_state.get_all_available_variables(self.app_state.progress_manager.user_data)
-                        formatted_prompt = goal_prompt.format(**all_variables)
-                    except KeyError:
-                        formatted_prompt = goal_prompt
+                    all_variables = scenario_state.get_all_available_variables(self.app_state.progress_manager.user_data)
+                    formatted_prompt = goal_prompt
+                    for key, value in all_variables.items():
+                        if value is not None:
+                            formatted_prompt = formatted_prompt.replace(f"{{{key}}}", str(value))
                     
                     slide.scrollable_content.controls.append(ChatMessage(ft.Text(formatted_prompt, selectable=True), is_user=False))
                     scenario_state.scenario_chat_history.append({"role": "assistant", "content": formatted_prompt})
@@ -221,15 +221,15 @@ class LessonViewModel:
                             next_goal = scenario_state.scenario_user_goals[scenario_state.scenario_current_goal_index]
                             next_goal_prompt = next_goal.get("chatbot_message", "")
                             if next_goal_prompt:
-                                try:
-                                    all_variables = scenario_state.get_all_available_variables(self.app_state.progress_manager.user_data)
-                                    chat_response = next_goal_prompt.format(**all_variables)
-                                except KeyError:
-                                    chat_response = next_goal_prompt
+                                all_variables = scenario_state.get_all_available_variables(self.app_state.progress_manager.user_data)
+                                chat_response = next_goal_prompt
+                                for key, value in all_variables.items():
+                                    if value is not None:
+                                        chat_response = chat_response.replace(f"{{{key}}}", str(value))
                             else:
-                                chat_response = "Goed gedaan! Laten we doorgaan."
+                                chat_response = config.get_text("goal_achieved_continue", "Well done! Let's continue.")
                         else:
-                            chat_response = "Perfect! Je hebt alle doelen bereikt."
+                            chat_response = config.get_text("all_goals_achieved", "Perfect! You have achieved all goals.")
                     elif "GOAL_ACHIEVED: false" in full_response:
                         # Check if this is an API error (contains error message after GOAL_ACHIEVED: false)
                         lines = full_response.split('\n')
@@ -298,11 +298,11 @@ class LessonViewModel:
                 current_goal = scenario_state.scenario_user_goals[0]
                 goal_prompt = current_goal.get("chatbot_message", "")
                 if goal_prompt:
-                    try:
-                        all_variables = scenario_state.get_all_available_variables(self.app_state.progress_manager.user_data)
-                        formatted_prompt = goal_prompt.format(**all_variables)
-                    except KeyError:
-                        formatted_prompt = goal_prompt
+                    all_variables = scenario_state.get_all_available_variables(self.app_state.progress_manager.user_data)
+                    formatted_prompt = goal_prompt
+                    for key, value in all_variables.items():
+                        if value is not None:
+                            formatted_prompt = formatted_prompt.replace(f"{{{key}}}", str(value))
                     
                     slide.scrollable_content.controls.append(ChatMessage(ft.Text(formatted_prompt, selectable=True), is_user=False))
                     scenario_state.scenario_chat_history.append({"role": "assistant", "content": formatted_prompt})
