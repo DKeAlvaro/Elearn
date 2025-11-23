@@ -4,65 +4,78 @@ This document outlines the structure of the language learning application, provi
 
 ## High-Level Overview
 
-The application is built using the Flet framework for the user interface and a language model (LLM) for AI-powered features. The core of the application is organized into the following directories:
+The application is built using the Flet framework for the user interface and a language model (LLM) for AI-powered features. The architecture is designed to be modular and centralized.
 
--   **`views/`**: Contains the different screens of the application.
--   **`view_models/`**: Handles the logic for the views.
--   **`data/`**: Manages loading and saving data, including lesson content and user progress.
--   **`llm/`**: Interacts with the language model API.
--   **`config/`**: Stores configuration settings.
+A key architectural pattern is the use of a singleton, `UserDataManager`, which handles all data persistence. It reads and writes to a single `user_data.json` file, which acts as the single source of truth for user settings, progress, and application data.
+
+Higher-level managers (`ProgressManager`, `DataManager`, `SettingsManager`) provide specific APIs and business logic, but they all rely on `UserDataManager` for the actual data storage. This creates a clean separation of concerns.
+
+The core of the application is organized into the following directories:
+
+-   **`src/`**: The main source code for the application.
+-   **`src/views/`**: Contains the different screens (Views) of the application.
+-   **`src/view_models/`**: Handles the logic and state for the Views (ViewModels).
+-   **`src/managers/`**: Contains high-level managers for different parts of the application's logic.
+-   **`src/llm/`**: Contains the client for interacting with the language model.
+-   **`src/config.py`**: Stores configuration settings.
 -   **`lessons/`**: Contains the lesson content in JSON format.
+-   **`app_languages/`**: Contains JSON files for UI localization.
 
 ## Key Files and Directories
 
 ### `main.py`
 
-This is the entry point of the application. It initializes the Flet app, sets up the main page, and handles routing between different views.
+This is the entry point of the application. It initializes the Flet app, sets up the main page, wires up all the managers, and handles routing between different views.
 
-### `config.py`
+### `src/config.py`
 
-This file contains the application's configuration, including:
+This is the central configuration file. It manages:
 
--   **API Keys**: `DEEPSEEK_API_KEY` and `OPENAI_API_KEY` for the language model.
--   **Language Settings**: `DEFAULT_LANGUAGE` to set the UI and lesson language.
--   **Themes**: A list of color schemes for the UI.
+-   **Language Settings**: `DEFAULT_LANGUAGE` sets the UI and lesson language. It loads the UI localization from the `app_languages/` directory.
+-   **Lesson Paths**: Dynamically constructs the path to the lesson content using the `language_folder_map`.
+-   **API Keys**: Manages the logic for API keys using `get_effective_api_key`. The application can use a user-provided DeepSeek API key, but will fall back to a free Gradio-based endpoint if no key is provided.
 
-To change the application's language, modify the `DEFAULT_LANGUAGE` variable. For example, to use a Spanish UI with lessons for learning French, set it to `"es-fr"`.
+### `src/managers/user_data_manager.py`
 
-### `data_manager.py`
+A critical component that acts as a **singleton** for all data persistence. It reads from and writes to `user_data.json`, providing a single, consistent source of truth for all user settings, progress, and application data. It is initialized once in `main.py` and passed to other managers.
 
-This class is responsible for loading lesson data from the JSON files in the `lessons/` directory. It provides methods to get all lessons, a specific lesson by ID, and the content of a lesson.
+### `src/managers/progress_manager.py`
 
-### `app_state.py`
+Provides a high-level API for managing user progress. It acts as an abstraction layer on top of `UserDataManager`, handling the business logic for marking lessons as completed and saving progress in interactive scenarios.
 
-This class manages the global state of the application, including:
+### `src/managers/settings_manager.py`
 
--   **Lesson Progress**: Tracks which lessons the user has completed.
--   **Premium Status**: Determines whether the user has access to premium content.
--   **Current Theme**: The currently selected UI theme.
+Handles the logic for the settings UI. It interacts with `UserDataManager` to get and set user-specific settings like the API key.
 
-### `llm_client.py`
+### `src/managers/data_manager.py`
 
-This class is a client for interacting with the language model API. It provides methods for:
+This class is responsible for loading lesson data from the JSON files in the `lessons/` directory.
 
--   **Getting a scenario response**: Used in interactive conversation scenarios.
--   **Extracting information**: Extracts specific information from user input.
--   **Evaluating goal completion**: Determines if the user has completed a learning objective.
--   **Getting a correction**: Provides feedback on user input.
+### `src/llm_client.py`
 
-### `views/`
+This class is the core of the AI functionality and features a dual-backend architecture:
+
+1.  **DeepSeek API**: Used if the user provides their own API key in the settings.
+2.  **Gradio/Hugging Face Fallback**: A free, public endpoint used if no API key is provided.
+
+The client uses structured prompting to get machine-readable JSON output from the LLM, which is key for the interactive exercises.
+
+### `src/app_state.py`
+
+This class aggregates various state managers (`DataManager`, `ProgressManager`, `LessonState`) and contains high-level business logic, such as the system for unlocking lessons sequentially.
+
+### `src/views/`
 
 This directory contains the different views of the application. Each view is a Flet `View` object that represents a screen.
 
 -   **`home_view.py`**: The main screen, which displays a list of lessons.
 -   **`lesson_view.py`**: The screen where the user interacts with a lesson.
 -   **`settings_view.py`**: The screen where the user can configure their API key.
--   **`premium_view.py`**: The screen for purchasing premium access.
 -   **`intro_view.py`**: The welcome screen shown on the first run.
 
-### `view_models/`
+### `src/view_models/`
 
-This directory contains the view models, which handle the logic for the views. Each view has a corresponding view model.
+This directory contains the view models, which handle the logic for the views, following the MVVM pattern.
 
 -   **`home_view_model.py`**: Manages the state of the home view, including the list of lessons.
 -   **`lesson_view_model.py`**: Manages the state of the lesson view, including the current slide and user input.
@@ -71,35 +84,25 @@ This directory contains the view models, which handle the logic for the views. E
 
 This file contains reusable UI components, such as chat messages, slide templates, and buttons.
 
-### `managers/`
-
-This directory contains managers for different parts of the application.
-
--   **`progress_manager.py`**: Manages loading and saving user progress.
--   **`billing_manager.py`**: Manages in-app purchases.
-
-### `state/`
-
-This directory contains classes that manage the state of different parts of the application.
-
--   **`lesson_state.py`**: Manages the state of the current lesson, including the current slide index.
--   **`scenario_state.py`**: Manages the state of an interactive scenario.
-
 ### `lessons/`
 
-This directory contains the lesson content in JSON format, organized by language. Each language has a subdirectory (e.g., `dutch/`, `spanish/`), which contains the lesson files.
+This directory contains the lesson content in JSON format, organized by language. Each language has a subdirectory (e.g., `dutch/`, `french/`).
 
 ### `generate_lessons/`
 
-This directory contains scripts for generating the lesson files. These scripts use a language model to create lesson content based on a predefined structure.
+This directory contains Python scripts for generating the lesson files. These scripts use a language model to create lesson content based on a predefined structure.
+
+### `app_languages/`
+
+This directory contains JSON files for UI localization. The `config.py` file loads the appropriate language file from here based on the `DEFAULT_LANGUAGE` setting.
 
 ## How to Make Changes
 
 ### Adding a New Language
 
-1.  Add the language to the `lessons/languages.txt` file.
-2.  Run the `generate_lessons/generate_lessons.py` script to create the lesson files.
-3.  Add the language to the `language_folder_map` in `config.py`.
+1.  **Generate Lessons**: Use the scripts in `generate_lessons/` (e.g., `generate_lessons.py`) to create a new folder with JSON lesson files for the desired language (e.g., `lessons/spanish/`).
+2.  **Translate UI (Optional)**: If you want to add UI translations for the new language, run `python generate_lessons/generate_language_settings.py --language <language_name>` to create the translated UI files in `app_languages/`.
+3.  **Update Config**: Add the new language to the `language_folder_map` dictionary in `src/config.py`. This will link the language code to the folder name you created in step 1.
 
 ### Modifying a Lesson
 
@@ -107,7 +110,7 @@ To modify a lesson, edit the corresponding JSON file in the `lessons/` directory
 
 ### Adding a New Feature
 
-1.  Create a new view in the `views/` directory.
-2.  Create a corresponding view model in the `view_models/` directory.
+1.  Create a new view in the `src/views/` directory.
+2.  Create a corresponding view model in the `src/view_models/` directory.
 3.  Add a route for the new view in `main.py`.
-4.  Implement the UI and logic for the new feature.
+4.  Implement the UI and logic for the new feature, ensuring to connect it to the appropriate managers and state objects.
