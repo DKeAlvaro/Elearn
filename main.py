@@ -83,11 +83,13 @@ async def main(page: ft.Page):
         page.go("/")
 
     # --- Routing ---
-    def route_change(route):
+    async def route_change(route):
         page.views.clear()
 
         if page.route == "/language_selection":
-            page.views.append(LanguageSelectionView(page, on_language_selection_complete))
+            view = LanguageSelectionView(page, on_language_selection_complete)
+            page.views.append(view)
+            await view.did_mount()
             page.update()
             return
 
@@ -115,7 +117,7 @@ async def main(page: ft.Page):
         page.go(top_view.route)
 
     page.on_route_change = route_change
-    page.on_view_pop = view_pop
+    page.on_view_pop = lambda e: view_pop(e)
 
     if user_data_manager.get_app_data("first_run", True):
         page.go("/language_selection")

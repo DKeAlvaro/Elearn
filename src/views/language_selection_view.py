@@ -48,10 +48,11 @@ class LanguageSelectionView(ft.View):
 
         self.target_lang_dropdown.on_change = self.check_dropdowns
 
-        self.populate_dropdowns()
+    async def did_mount(self):
+        await self.populate_dropdowns()
 
-    def populate_dropdowns(self):
-        _, target_langs = self.view_model.get_available_languages()
+    async def populate_dropdowns(self):
+        _, target_langs = await self.view_model.get_available_languages()
         self.target_lang_dropdown.options = [ft.dropdown.Option(lang) for lang in target_langs]
         self.page.update()
 
@@ -62,12 +63,12 @@ class LanguageSelectionView(ft.View):
             self.download_button.disabled = True
         self.page.update()
 
-    def on_download(self, e):
+    async def on_download(self, e):
         self.download_button.disabled = True
         self.progress_ring.visible = True
         self.page.update()
 
-        self.view_model.download_languages(
+        await self.view_model.download_languages(
             "en",
             self.target_lang_dropdown.value
         )

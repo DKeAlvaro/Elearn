@@ -7,16 +7,16 @@ class LanguageSelectionViewModel:
         self.github_service = GitHubService()
         self.on_complete = on_complete
 
-    def get_available_languages(self):
+    async def get_available_languages(self):
         try:
-            return self.github_service.get_available_languages()
+            return await self.github_service.get_available_languages()
         except Exception as e:
             print(f"Error getting available languages: {e}")
             return [], []
 
-    def download_languages(self, ui_lang, target_lang_folder):
+    async def download_languages(self, ui_lang, target_lang_folder):
         try:
-            self.github_service.download_language_files("en", target_lang_folder)
+            await self.github_service.download_language_files("en", target_lang_folder)
             
             target_lang_code = self._get_target_lang_code(target_lang_folder)
             if target_lang_code:
