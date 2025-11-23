@@ -60,6 +60,17 @@ This class is the core of the AI functionality and features a dual-backend archi
 
 The client uses structured prompting to get machine-readable JSON output from the LLM, which is key for the interactive exercises.
 
+### `src/services/github_service.py`
+
+This service is responsible for downloading language assets (UI tranºslations and lesson files) from an external GitHub repository.
+
+-   **Repository**: It connects to the `DKeAlvaro/llmers-langs` repository.
+-   **Functionality**: It fetches the list of available languages and downloads the corresponding files for the selected language combination.
+-   **File Overwriting**: The service overwrites local files in the `app_languages/` and `lessons/` directories with the versions from the GitHub repository. This ensures that the application is always using the latest version of the language assets.
+-   **Authentication**: It uses a GitHub Personal Access Token (PAT) stored in the `GITHUB_PAT` environment variable to authenticate with the GitHub API.
+
+This service is a key component for the application's language management, but it's important to be aware that it will overwrite local changes to the lesson and language files.
+
 ### `src/app_state.py`
 
 This class aggregates various state managers (`DataManager`, `ProgressManager`, `LessonState`) and contains high-level business logic, such as the system for unlocking lessons sequentially.
