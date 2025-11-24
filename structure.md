@@ -16,10 +16,13 @@ The core of the application is organized into the following directories:
 -   **`src/views/`**: Contains the different screens (Views) of the application.
 -   **`src/view_models/`**: Handles the logic and state for the Views (ViewModels).
 -   **`src/managers/`**: Contains high-level managers for different parts of the application's logic.
--   **`src/llm/`**: Contains the client for interacting with the language model.
+-   **`src/state/`**: Contains state classes used by view models.
+-   **`src/services/`**: External integrations (e.g., GitHub).
+-   **`src/utils/`**: Utility helpers (network, typing simulator).
+-   **`src/llm_client.py`**: Client for interacting with the language model.
 -   **`src/config.py`**: Stores configuration settings.
--   **`lessons/`**: Contains the lesson content in JSON format.
--   **`app_languages/`**: Contains JSON files for UI localization.
+-   **`app_languages/`**: JSON files for UI localization.
+-   **`lessons/`**: Runtime-downloaded lesson content in JSON format (ignored by git).
 
 ## Key Files and Directories
 
@@ -27,17 +30,28 @@ The core of the application is organized into the following directories:
 
 This is the entry point of the application. It initializes the Flet app, sets up the main page, wires up all the managers, and handles routing between different views.
 
+Routes:
+- `/` → Home
+- `/lesson` → Lesson
+- `/settings` → Settings
+- `/language_selection` → First-run language setup
+
 ### `src/config.py`
 
 This is the central configuration file. It manages:
 
--   **Language Settings**: `DEFAULT_LANGUAGE` sets the UI and lesson language. It loads the UI localization from the `app_languages/` directory.
--   **Lesson Paths**: Dynamically constructs the path to the lesson content using the `language_folder_map`.
--   **API Keys**: Manages the logic for API keys using `get_effective_api_key`. The application can use a user-provided DeepSeek API key, but will fall back to a free Gradio-based endpoint if no key is provided.
+-   **Unified Language Setting**: A single value like `en-nl` (UI language-target language) is stored via `UserDataManager` on first run and used by config. UI strings are loaded from `app_languages/<ui>.json`.
+-   **Lesson Paths**: Dynamically builds `lessons/<target_folder>/<ui-target>` via `get_lessons_folder()` and `get_target_language_folder()`.
+-   **API Keys**: `get_effective_api_key()` prioritizes a runtime key, then the user-saved key, then environment variables (`OPENAI_API_KEY` or `DEEPSEEK_API_KEY`).
 
 ### `src/managers/user_data_manager.py`
 
 A critical component that acts as a **singleton** for all data persistence. It reads from and writes to `user_data.json`, providing a single, consistent source of truth for all user settings, progress, and application data. It is initialized once in `main.py` and passed to other managers.
+
+Schema:
+- `settings`: persisted preferences (e.g., `deepseek_api_key`, `selected_language`).
+- `progress`: `completed_lessons`, `interactive_scenario_progress`, `lesson_slide_positions`, `user_data`.
+- `app_data`: flags like `first_run`.
 
 ### `src/managers/progress_manager.py`
 
@@ -49,7 +63,7 @@ Handles the logic for the settings UI. It interacts with `UserDataManager` to ge
 
 ### `src/managers/data_manager.py`
 
-This class is responsible for loading lesson data from the JSON files in the `lessons/` directory.
+Loads lesson data from JSON files in the language-specific folder returned by `config.get_lessons_folder()`. Supports reloading and sorting lessons by ID.
 
 ### `src/llm_client.py`
 
@@ -60,9 +74,13 @@ This class is the core of the AI functionality and features a dual-backend archi
 
 The client uses structured prompting to get machine-readable JSON output from the LLM, which is key for the interactive exercises.
 
+Behavior:
+- Validates and uses DeepSeek via OpenAI SDK when a valid key is present.
+- Falls back to a Gradio client when no valid key is available.
+
 ### `src/services/github_service.py`
 
-This service is responsible for downloading language assets (UI tranºslations and lesson files) from an external GitHub repository.
+This service is responsible for downloading language assets (UI translations and lesson files) from an external GitHub repository.
 
 -   **Repository**: It connects to the `DKeAlvaro/llmers-langs` repository.
 -   **Functionality**: It fetches the list of available languages and downloads the corresponding files for the selected language combination.
@@ -75,6 +93,8 @@ This service is a key component for the application's language management, but i
 
 This class aggregates various state managers (`DataManager`, `ProgressManager`, `LessonState`) and contains high-level business logic, such as the system for unlocking lessons sequentially.
 
+Also exposes `reload_lessons()` and encapsulates scenario state for interactive exercises.
+
 ### `src/views/`
 
 This directory contains the different views of the application. Each view is a Flet `View` object that represents a screen.
@@ -82,7 +102,7 @@ This directory contains the different views of the application. Each view is a F
 -   **`home_view.py`**: The main screen, which displays a list of lessons.
 -   **`lesson_view.py`**: The screen where the user interacts with a lesson.
 -   **`settings_view.py`**: The screen where the user can configure their API key.
--   **`intro_view.py`**: The welcome screen shown on the first run.
+-   **`language_selection_view.py`**: First-run setup where the user selects the target language and downloads assets.
 
 ### `src/view_models/`
 
@@ -90,34 +110,35 @@ This directory contains the view models, which handle the logic for the views, f
 
 -   **`home_view_model.py`**: Manages the state of the home view, including the list of lessons.
 -   **`lesson_view_model.py`**: Manages the state of the lesson view, including the current slide and user input.
+-   **`language_selection_view_model.py`**: Orchestrates language discovery and downloads via `GitHubService`, persists the selection, and refreshes config.
 
 ### `ui_components.py`
 
-This file contains reusable UI components, such as chat messages, slide templates, and buttons.
+Reusable UI components: app bar, titles, multiple slide types (vocabulary, expression, grammar, tips, pronunciation), interactive scenario and LLM-check slides, and a network status indicator.
 
 ### `lessons/`
 
-This directory contains the lesson content in JSON format, organized by language. Each language has a subdirectory (e.g., `dutch/`, `french/`).
+Runtime-downloaded lesson content in JSON format, organized by target language. Path structure: `lessons/<target_folder>/<ui-target>/...`. This directory is ignored by git and is populated by `GitHubService` during the first run and when the user re-downloads assets.
 
-### `generate_lessons/`
+### `src/utils/`
 
-This directory contains Python scripts for generating the lesson files. These scripts use a language model to create lesson content based on a predefined structure.
+Utilities such as `network_utils.py` (offline detection and status helpers) and `typing_simulator.py`.
 
 ### `app_languages/`
 
-This directory contains JSON files for UI localization. The `config.py` file loads the appropriate language file from here based on the `DEFAULT_LANGUAGE` setting.
+This directory contains JSON files for UI localization. `config.py` loads `app_languages/<ui>.json` based on the unified language setting.
 
 ## How to Make Changes
 
 ### Adding a New Language
 
-1.  **Generate Lessons**: Use the scripts in `generate_lessons/` (e.g., `generate_lessons.py`) to create a new folder with JSON lesson files for the desired language (e.g., `lessons/spanish/`).
-2.  **Translate UI (Optional)**: If you want to add UI translations for the new language, run `python generate_lessons/generate_language_settings.py --language <language_name>` to create the translated UI files in `app_languages/`.
-3.  **Update Config**: Add the new language to the `language_folder_map` dictionary in `src/config.py`. This will link the language code to the folder name you created in step 1.
+1.  **Use the Language Selection screen**: On first run (or via the route `/language_selection`), pick the target language. The app will download the UI file and lessons from `DKeAlvaro/llmers-langs` using your `GITHUB_PAT`.
+2.  **Persist Selection**: The chosen combination (e.g., `en-nl`) is saved to `user_data.json` (`selected_language`), and `config.load_language()` refreshes UI strings.
+3.  **Contribute upstream for new languages**: To add a brand-new language not listed, add assets to the `llmers-langs` repository so they can be fetched by the app.
 
 ### Modifying a Lesson
 
-To modify a lesson, edit the corresponding JSON file in the `lessons/` directory. The lesson files have a specific structure, so be sure to follow the existing format.
+Edit the corresponding JSON file under `lessons/<target_folder>/<ui-target>/`. Note that re-downloading assets from GitHub will overwrite local changes; for persistent changes, update the upstream repository.
 
 ### Adding a New Feature
 

@@ -48,8 +48,9 @@ class LanguageSelectionView(ft.View):
 
         self.target_lang_dropdown.on_change = self.check_dropdowns
 
-    async def did_mount(self):
-        await self.populate_dropdowns()
+    def did_mount(self):
+        # Schedule the async population of dropdowns
+        self.page.run_task(self.populate_dropdowns)
 
     async def populate_dropdowns(self):
         _, target_langs = await self.view_model.get_available_languages()
